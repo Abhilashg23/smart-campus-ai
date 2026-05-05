@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard - Smart Campus{% endblock %}
+
+{% block content %}
+<style>
+    .fd-wrap {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #f1f5f9;
+        min-height: 100vh;
+    }
+
+    /* Welcome Hero */
+    .fd-hero {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 24px;
+        padding: 2.5rem 3rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(79,70,229,0.25);
+    }
+    .fd-hero h1 { font-size: 2.5rem; font-weight: 800; margin: 0 0 0.4rem 0; }
+    .fd-hero p  { font-size: 1.1rem; opacity: 0.85; margin: 0 0 1.25rem 0; }
+    .fd-hero .badge-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .fd-hero .badge-pill {
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 100px;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .fd-hero .bg-icon {
+        position: absolute; right: -20px; bottom: -30px;
+        font-size: 14rem; color: rgba(255,255,255,0.06);
+        transform: rotate(-15deg); pointer-events: none;
+    }
+
+    /* Stats Grid — 4 columns, pure CSS Grid */
+    .fd-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    @media (max-width: 900px)  { .fd-stats { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px)  { .fd-stats { grid-template-columns: 1fr; } }
+
+    .fd-stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.75rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        border: 1px solid #e8edf3;
+        transition: transform .25s, box-shadow .25s;
+    }
+    .fd-stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.1); }
+    .fd-stat-icon {
+        width: 52px; height: 52px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; margin: 0 auto 1rem;
+    }
+    .fd-stat-card h2 { font-size: 2.25rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem 0; }
+    .fd-stat-card p  { margin: 0; color: #94a3b8; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* Main 2-column layout */
+    .fd-main {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    @media (max-width: 1024px) { .fd-main { grid-template-columns: 1fr; } }
+
+    /* White card */
+    .fd-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8edf3;
+        overflow: hidden;
+    }
+    .fd-card-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    /* Action Tiles Grid — 3 equal columns */
+    .fd-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        padding: 1.75rem;
+    }
+    @media (max-width: 700px) { .fd-actions { grid-template-columns: 1fr 1fr; } }
+
+    .fd-action-tile {
+        background: #f8fafc;
+        border: 1px solid #e8edf3;
+        border-radius: 18px;
+        padding: 1.5rem;
+        text-align: left;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: all .25s cubic-bezier(.4,0,.2,1);
+    }
+    .fd-action-tile:hover {
+        background: white;
+        border-color: #4f46e5;
+        box-shadow: 0 8px 24px rgba(79,70,229,0.12);
+        transform: translateY(-4px);
+        color: inherit;
+        text-decoration: none;
+    }
+    .fd-action-tile .tile-icon {
+        width: 46px; height: 46px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; margin-bottom: 1rem;
+    }
+    .fd-action-tile h4 { font-size: 1rem; font-weight: 700; margin: 0 0 0.3rem 0; color: #0f172a; }
+    .fd-action-tile p  { font-size: 0.82rem; color: #64748b; margin: 0; line-height: 1.4; }
+
+    /* Attention HUD */
+    .fd-hud {
+        background: #0f172a;
+        border-radius: 20px;
+        padding: 1.75rem;
+        margin: 1.75rem;
+        margin-top: 0;
+    }
+    .fd-hud-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .fd-hud-header h4 { margin: 0; color: white; font-weight: 700; font-size: 1.05rem; }
+    .fd-hud-header p  { margin: 0; color: #64748b; font-size: 0.8rem; }
+    .btn-hud {
+        background: #4f46e5; color: white; border: none;
+        padding: 0.65rem 1.25rem; border-radius: 10px;
+        font-weight: 700; font-size: 0.85rem; cursor: pointer;
+        transition: background .2s;
+        white-space: nowrap;
+    }
+    .btn-hud:hover { background: #4338ca; }
+    .btn-hud.stop { background: #f43f5e; }
+    .hud-stats {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+    }
+    .hud-stat {
+        background: #1e293b; border-radius: 12px;
+        padding: 1rem; text-align: center;
+    }
+    .hud-stat .lbl { display: block; font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; }
+    .hud-stat .val { font-size: 1.75rem; font-weight: 800; color: white; line-height: 1.1; }
+
+    /* Right sidebar */
+    .fd-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .fd-profile-card {
+        background: white; border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8edf3;
+        padding: 1.75rem; text-align: center;
+    }
+    .fd-profile-img {
+        width: 90px; height: 90px; border-radius: 20px;
+        object-fit: cover; margin: 0 auto 1rem;
+        display: block; border: 3px solid #f1f5f9;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    .fd-profile-avatar {
+        width: 90px; height: 90px; border-radius: 20px;
+        background: #f1f5f9; color: #94a3b8;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; margin: 0 auto 1rem;
+    }
+    .fd-profile-name { font-weight: 700; color: #0f172a; font-size: 1.1rem; margin: 0 0 0.25rem 0; }
+    .fd-profile-email { font-size: 0.85rem; color: #64748b; margin: 0 0 1.25rem 0; }
+    .fd-profile-meta {
+        background: #f8fafc; border-radius: 14px;
+        padding: 1rem 1.25rem; text-align: left;
+        display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .fd-profile-meta .meta-row { display: flex; gap: 0.7rem; align-items: flex-start; }
+    .fd-profile-meta .meta-row i { margin-top: 3px; }
+    .fd-profile-meta .meta-label { font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .fd-profile-meta .meta-val { font-size: 0.88rem; color: #475569; font-weight: 600; }
+
+    .fd-events-card {
+        background: white; border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        border: 1px solid #e8edf3;
+        overflow: hidden;
+    }
+    .fd-events-card .ev-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-weight: 700; color: #0f172a; font-size: 1rem;
+        display: flex; align-items: center; gap: 0.5rem;
+    }
+    .fd-event-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f8fafc;
+        border-left: 4px solid #4f46e5;
+        margin: 0.75rem;
+        border-radius: 0 12px 12px 0;
+        background: #f8fafc;
+    }
+    .fd-event-item h6 { margin: 0 0 0.25rem 0; font-weight: 700; color: #0f172a; font-size: 0.9rem; }
+    .fd-event-item p  { margin: 0; font-size: 0.8rem; color: #64748b; }
+    .fd-empty { text-align: center; padding: 2.5rem 1.5rem; color: #94a3b8; }
+    .fd-empty i { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+</style>
+
+<div class="fd-wrap">
+    <!-- Hero Banner -->
+    <div class="fd-hero">
+        <div style="position: relative; z-index: 2;">
+            <h1>Welcome, {{ current_user.full_name }}!</h1>
+            <p>Faculty Portal &mdash; Marks, Attendance &amp; Class Management</p>
+            <div class="badge-row">
+                <span class="badge-pill"><i class="fas fa-id-badge" style="margin-right:6px;"></i>{{ current_user.designation or 'Faculty' }}</span>
+                <span class="badge-pill"><i class="fas fa-building" style="margin-right:6px;"></i>{{ current_user.department.name if current_user.department else 'University' }}</span>
+            </div>
+        </div>
+        <i class="fas fa-graduation-cap bg-icon"></i>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show" style="border-radius:14px; margin-bottom:1.5rem;">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Stats Row -->
+    <div class="fd-stats">
+        <div class="fd-stat-card">
+            <div class="fd-stat-icon" style="background:#eff6ff; color:#3b82f6;"><i class="fas fa-users"></i></div>
+            <h2>{{ total_students or 0 }}</h2>
+            <p>Total Students</p>
+        </div>
+        <div class="fd-stat-card">
+            <div class="fd-stat-icon" style="background:#ecfdf5; color:#10b981;"><i class="fas fa-book-open"></i></div>
+            <h2>{{ total_classes or 0 }}</h2>
+            <p>Your Subjects</p>
+        </div>
+        <div class="fd-stat-card">
+            <div class="fd-stat-icon" style="background:#fffbeb; color:#f59e0b;"><i class="fas fa-calendar-check"></i></div>
+            <h2>{{ attendance_today or 0 }}</h2>
+            <p>Attendance Today</p>
+        </div>
+        <div class="fd-stat-card">
+            <div class="fd-stat-icon" style="background:#fef2f2; color:#ef4444;"><i class="fas fa-calendar-alt"></i></div>
+            <h2>{{ upcoming_events|length }}</h2>
+            <p>Upcoming Events</p>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="fd-main">
+        <!-- Left: Actions + HUD -->
+        <div>
+            <div class="fd-card" style="margin-bottom: 1.5rem;">
+                <div class="fd-card-header">
+                    <i class="fas fa-th-large" style="color:#4f46e5;"></i> Academic Management
+                </div>
+                <div class="fd-actions">
+                    <a href="{{ url_for('faculty.attendance') }}" class="fd-action-tile">
+                        <div class="tile-icon" style="background:#eef2ff; color:#4f46e5;"><i class="fas fa-clipboard-check"></i></div>
+                        <h4>Attendance</h4>
+                        <p>View &amp; manage daily student logs</p>
+                    </a>
+                    <a href="{{ url_for('faculty.marks') }}" class="fd-action-tile">
+                        <div class="tile-icon" style="background:#fdf2f8; color:#db2777;"><i class="fas fa-file-invoice"></i></div>
+                        <h4>Internal Marks</h4>
+                        <p>Upload &amp; enter subject marks</p>
+                    </a>
+                    <a href="{{ url_for('faculty.profile') }}" class="fd-action-tile">
+                        <div class="tile-icon" style="background:#f0fdf4; color:#10b981;"><i class="fas fa-user-circle"></i></div>
+                        <h4>My Profile</h4>
+                        <p>Update bio &amp; research areas</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Attention HUD -->
+            <div class="fd-card">
+                <div class="fd-card-header">
+                    <i class="fas fa-eye" style="color:#f59e0b;"></i> Class Attention Monitor
+                </div>
+                <div class="fd-hud">
+                    <div class="fd-hud-header">
+                        <div>
+                            <h4>Live Focus HUD</h4>
+                            <p>Real-time student attention analysis</p>
+                        </div>
+                        <button id="toggleMonitoring" class="btn-hud">▶ Start HUD</button>
+                    </div>
+
+                    <div id="alertBanner" style="display:none; background:#f43f5e; color:white; padding:0.75rem 1rem; border-radius:10px; text-align:center; font-weight:700; margin-bottom:1rem;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>DISTRACTION ALERT: Multiple students inactive
+                    </div>
+
+                    <div class="hud-stats">
+                        <div class="hud-stat">
+                            <span class="lbl">Total</span>
+                            <span class="val" id="totalFaces">—</span>
+                        </div>
+                        <div class="hud-stat">
+                            <span class="lbl">Focused</span>
+                            <span class="val" id="focusedCount" style="color:#10b981;">—</span>
+                        </div>
+                        <div class="hud-stat">
+                            <span class="lbl">Inactive</span>
+                            <span class="val" id="distractedCount" style="color:#f43f5e;">—</span>
+                        </div>
+                    </div>
+
+                    <div id="cameraContainer" style="display:none; margin-top:1.25rem; border-radius:14px; overflow:hidden;">
+                        <video id="cameraFeed" autoplay muted playsinline style="width:100%; border-radius:14px;"></video>
+                    </div>
+                    <p id="hudStatus" style="color:#475569; font-size:0.82rem; margin-top:1rem; text-align:center;">Click Start to begin scanning.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="fd-sidebar">
+            <!-- Profile Card -->
+            <div class="fd-profile-card">
+                {% if current_user.profile_image %}
+                    <img src="{{ current_user.profile_image }}" class="fd-profile-img" alt="Profile">
+                {% else %}
+                    <div class="fd-profile-avatar"><i class="fas fa-user"></i></div>
+                {% endif %}
+                <p class="fd-profile-name">{{ current_user.full_name }}</p>
+                <p class="fd-profile-email">{{ current_user.email }}</p>
+
+                <div class="fd-profile-meta">
+                    <div class="meta-row">
+                        <i class="fas fa-graduation-cap" style="color:#4f46e5;"></i>
+                        <div>
+                            <div class="meta-label">Education</div>
+                            <div class="meta-val">{{ current_user.education or 'Not set' }}</div>
+                        </div>
+                    </div>
+                    <div class="meta-row">
+                        <i class="fas fa-microscope" style="color:#db2777;"></i>
+                        <div>
+                            <div class="meta-label">Research Interests</div>
+                            <div class="meta-val" style="overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ current_user.research_interests or 'Not set' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="fd-events-card">
+                <div class="ev-header">
+                    <i class="fas fa-calendar-star" style="color:#f59e0b;"></i> Upcoming Events
+                </div>
+                {% if upcoming_events %}
+                    {% for event in upcoming_events %}
+                    <div class="fd-event-item">
+                        <h6>{{ event.title }}</h6>
+                        <p><i class="fas fa-clock me-1" style="color:#94a3b8;"></i>{{ event.event_date|datetime('%b %d, %H:%M') }}</p>
+                        <p style="margin-top:0.2rem;">{{ event.location }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="fd-empty">
+                        <i class="fas fa-calendar-times"></i>
+                        <p style="font-size:0.9rem; margin:0;">No scheduled events</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isMonitoring = false, monitorInterval = null, stream = null, sessionId = null, logCtr = 0;
+    const btn = document.getElementById('toggleMonitoring');
+    const video = document.getElementById('cameraFeed');
+    const camBox = document.getElementById('cameraContainer');
+    const alert = document.getElementById('alertBanner');
+    const status = document.getElementById('hudStatus');
+
+    btn.addEventListener('click', async () => isMonitoring ? stop() : await start());
+
+    async function start() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            video.srcObject = stream;
+            isMonitoring = true;
+            btn.textContent = '⏹ Stop HUD';
+            btn.classList.add('stop');
+            camBox.style.display = 'block';
+            status.textContent = 'Live — analysing every 3s…';
+            sessionId = Math.random().toString(36).slice(2);
+            monitorInterval = setInterval(analyse, 3000);
+            analyse();
+        } catch (e) { status.textContent = 'Camera access denied: ' + e.message; }
+    }
+
+    function stop() {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        clearInterval(monitorInterval);
+        isMonitoring = false;
+        btn.textContent = '▶ Start HUD';
+        btn.classList.remove('stop');
+        camBox.style.display = 'none';
+        alert.style.display = 'none';
+        status.textContent = 'Click Start to begin scanning.';
+        ['totalFaces','focusedCount','distractedCount'].forEach(id => document.getElementById(id).textContent = '—');
+    }
+
+    async function analyse() {
+        const c = document.createElement('canvas');
+        c.width = video.videoWidth; c.height = video.videoHeight;
+        c.getContext('2d').drawImage(video, 0, 0);
+        const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.8));
+        const fd = new FormData();
+        fd.append('image', blob, 'f.jpg');
+        fd.append('session_id', sessionId);
+        if (++logCtr >= 5) { fd.append('log','true'); logCtr = 0; }
+        try {
+            const r = await fetch('/faculty/api/monitor-attention', { method:'POST', body:fd });
+            const d = await r.json();
+            if (d.success) {
+                document.getElementById('totalFaces').textContent = d.total_faces;
+                document.getElementById('focusedCount').textContent = d.focused_count;
+                document.getElementById('distractedCount').textContent = d.distracted_count;
+                alert.style.display = d.alert ? 'block' : 'none';
+                const pct = d.total_faces > 0 ? Math.round(d.focused_count/d.total_faces*100) : 0;
+                status.textContent = `${d.total_faces} student(s) detected — ${pct}% focused`;
+            }
+        } catch(e) {}
+    }
+</script>
+{% endblock %}

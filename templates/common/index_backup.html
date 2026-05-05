@@ -1,0 +1,998 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Campus - Chanakya University{% endblock %}
+
+{% block head %}
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Slideshow Background -->
+<section class="hero-section">
+    <!-- Slideshow Background -->
+    <div class="slideshow-background">
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/hero_bg.png') }}" alt="Smart Campus Future">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/campus_technology.png') }}" alt="Campus Technology">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/ai_education.png') }}" alt="AI Powered Education">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/smart_security.png') }}" alt="Intelligent Security">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/facial_recognition.png') }}" alt="Biometric Access">
+        </div>
+    </div>
+
+    <!-- Dark Overlay -->
+    <div class="hero-overlay"></div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <div class="hero-text fade-in-up">
+            <h1 class="hero-title">Where Ideals Reside, and Ideas Thrive</h1>
+            <p class="hero-subtitle">
+                Chanakya University Smart Campus - Transforming education through AI-powered innovation and intelligent
+                automation
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slideshow Navigation -->
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" onclick="scrollToNextSection()">
+        <div class="scroll-arrow"></div>
+    </div>
+
+    <!-- Dots -->
+    <div class="dots-container-hero">
+        <span class="dot" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+        <span class="dot" onclick="currentSlide(4)"></span>
+        <span class="dot" onclick="currentSlide(5)"></span>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card fade-in-up" style="animation-delay: 0s;">
+                <div class="stat-number">67+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.1s;">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Schools</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.2s;">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.3s;">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">AI Support</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content fade-in-up">
+                <span class="section-badge">About Chanakya University</span>
+                <h2 class="section-title">Rooted in Ideals, Ascending with Ideas</h2>
+                <p class="section-text">
+                    Chanakya University is a pioneering exemplar of the vision of a Multidisciplinary University as
+                    elucidated in the new National Education Policy (NEP 2020). Established in 2022 through a State
+                    Legislature Act, we are committed to addressing developmental challenges with innovative solutions.
+                </p>
+                <p class="section-text">
+                    Our Smart Campus system leverages AI-powered technology and face recognition to create an
+                    intelligent, automated campus management ecosystem that enhances the educational experience for
+                    students, faculty, and administrators.
+                </p>
+            </div>
+            <div class="about-image fade-in-up" style="animation-delay: 0.2s;">
+                <img src="{{ url_for('static', filename='images/campus_technology.png') }}" alt="Campus Technology">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <span class="section-badge">Smart Campus Features</span>
+            <h2 class="section-title">Intelligent Campus Management</h2>
+            <p class="section-subtitle">Advanced technology for modern educational institutions</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card fade-in-up" style="animation-delay: 0s;">
+                <div class="feature-content">
+                    <h3>AI-Powered Intelligence</h3>
+                    <p>Leverage Google's Gemini AI to provide instant, accurate responses to student and faculty queries
+                        with natural language processing and context-aware assistance.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.1s;">
+                <div class="feature-content">
+                    <h3>Biometric Security</h3>
+                    <p>Advanced facial recognition technology ensures secure, contactless attendance tracking and campus
+                        access control with real-time verification.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.2s;">
+                <div class="feature-content">
+                    <h3>Real-Time Analytics</h3>
+                    <p>Comprehensive dashboards provide actionable insights to track attendance patterns, monitor
+                        engagement, and make data-driven decisions.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.3s;">
+                <div class="feature-content">
+                    <h3>Event Management</h3>
+                    <p>Schedule, organize, and track campus events with automated notifications and seamless
+                        coordination across departments.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.4s;">
+                <div class="feature-content">
+                    <h3>Communication Hub</h3>
+                    <p>Integrated messaging and collaboration tools facilitate seamless communication between students,
+                        faculty, and administration.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.5s;">
+                <div class="feature-content">
+                    <h3>Smart Automation</h3>
+                    <p>Automated workflows reduce administrative workload by 85%, allowing staff to focus on strategic
+                        initiatives and student success.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Schools Section -->
+<section class="schools-section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <span class="section-badge">Academic Excellence</span>
+            <h2 class="section-title">Schools at Chanakya University</h2>
+            <p class="section-subtitle">Programs crafted by renowned academicians</p>
+        </div>
+
+        <div class="schools-grid">
+            <div class="school-card fade-in-up" style="animation-delay: 0s;">
+                <h3>School of Engineering</h3>
+                <p>Cutting-edge programs in technology and innovation</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.1s;">
+                <h3>School of Management Sciences</h3>
+                <p>Leadership and business excellence programs</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.2s;">
+                <h3>School of Arts, Humanities and Social Sciences</h3>
+                <p>Comprehensive liberal arts education</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.3s;">
+                <h3>School of Law, Governance and Public Policy</h3>
+                <p>Shaping future leaders in law and governance</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.4s;">
+                <h3>School of Mathematics and Natural Sciences</h3>
+                <p>Research-driven scientific education</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.5s;">
+                <h3>School of Biosciences</h3>
+                <p>Advancing life sciences and biotechnology</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<style>
+    /* ========================================
+       MODERN DESIGN SYSTEM - CSS VARIABLES
+       ======================================== */
+    :root {
+        /* Color Palette - Vibrant & Modern */
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+        /* Glassmorphism */
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+        /* Typography */
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+        /* Spacing */
+        --section-padding: 8rem 0;
+        --card-padding: 3rem;
+
+        /* Shadows */
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+        --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.2);
+
+        /* Border Radius */
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 32px;
+    }
+
+    /* ========================================
+       GLOBAL STYLES
+       ======================================== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-primary);
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* ========================================
+       HERO SECTION - MODERN GLASSMORPHISM
+       ======================================== */
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        min-height: 700px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+    }
+
+    .slideshow-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .slideshow-background .slide {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .slideshow-background .slide.active {
+        display: block;
+        animation: zoomIn 1.5s ease-out;
+    }
+
+    .slideshow-background .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+        max-width: 1000px;
+        padding: 2rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.5rem);
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        line-height: 1.7;
+        animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .btn {
+        padding: 1.25rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #1e3a8a;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite;
+        z-index: 10;
+    }
+
+    .scroll-arrow {
+        width: 30px;
+        height: 30px;
+        border-left: 3px solid white;
+        border-bottom: 3px solid white;
+        transform: rotate(-45deg);
+    }
+
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        40% {
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        60% {
+            transform: translateX(-50%) translateY(-5px);
+        }
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.5rem);
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        line-height: 1.7;
+        animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .btn {
+        padding: 1.25rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #1e3a8a;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite, blink 1.5s infinite;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+
+    .scroll-indicator:hover {
+        transform: translateX(-50%) scale(1.2);
+        animation: bounce 1s infinite, blink 0.8s infinite;
+    }
+
+    .scroll-arrow {
+        width: 35px;
+        height: 35px;
+        border-left: 4px solid white;
+        border-bottom: 4px solid white;
+        transform: rotate(-45deg);
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+    }
+
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        40% {
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        60% {
+            transform: translateX(-50%) translateY(-5px);
+        }
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    /* Slideshow Section */
+    .slideshow-section {
+        padding: 0;
+        background: #000;
+    }
+
+    .slideshow-container {
+        position: relative;
+        max-width: 100%;
+        margin: auto;
+        height: 600px;
+        overflow: hidden;
+    }
+
+    .slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .slide.active {
+        display: block;
+        animation: fadeIn 1s;
+    }
+
+    .prev,
+    .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        margin-top: -22px;
+        padding: 16px;
+        color: white;
+        font-weight: bold;
+        font-size: 24px;
+        transition: 0.3s ease;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+        background-color: rgba(0, 0, 0, 0.5);
+        text-decoration: none;
+        z-index: 10;
+    }
+
+    .prev {
+        left: 0;
+        border-radius: 0 3px 3px 0;
+    }
+
+    .next {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .prev:hover,
+    .next:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .dots-container-hero {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 10;
+    }
+
+    .dot {
+        cursor: pointer;
+        height: 12px;
+        width: 12px;
+        margin: 0 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    .dot.active,
+    .dot:hover {
+        background-color: #fff;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        padding: 4rem 0;
+        color: white;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .stat-card {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .stat-card.visible {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: white;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    /* Section Styles */
+    .about-section,
+    .features-section,
+    .schools-section,
+    .technology-section {
+        padding: 6rem 0;
+    }
+
+    .about-section {
+        background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    }
+
+    .features-section {
+        background: white;
+    }
+
+    .schools-section {
+        background: linear-gradient(to bottom, #f8fafc, #ffffff);
+    }
+
+    .technology-section {
+        background: white;
+    }
+
+    .section-badge {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        border-radius: 50px;
+        color: #3b82f6;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+        font-size: 1.3rem;
+        color: #64748b;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .section-text {
+        color: #64748b;
+        line-height: 1.8;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    /* About Grid */
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .about-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .feature-card {
+        padding: 3rem;
+        background: linear-gradient(to bottom, white, #f8fafc);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e2e8f0;
+        transition: all 0.4s ease;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .feature-card.visible {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        border-color: #3b82f6;
+    }
+
+    .feature-content h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+
+    .feature-content p {
+        color: #64748b;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    /* Schools Grid */
+    .schools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .school-card {
+        padding: 2.5rem 2rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border-radius: 16px;
+        border: 2px solid rgba(59, 130, 246, 0.1);
+        transition: all 0.4s ease;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .school-card.visible {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .school-card:hover {
+        transform: translateY(-8px);
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    }
+
+    .school-card h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+
+    .school-card p {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 1.05rem;
+    }
+
+    /* Technology Grid */
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .tech-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .tech-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .tech-item {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        border-radius: 12px;
+    }
+
+    .tech-item h4 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .tech-item p {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+
+        .about-grid,
+        .tech-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .features-grid,
+        .schools-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tech-list {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+    }
+</style>
+
+<script>
+    // Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', function () {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in-up, .stat-card, .feature-card, .school-card').forEach((el) => {
+            observer.observe(el);
+        });
+
+        // Slideshow functionality
+        let slideIndex = 1;
+        let slideTimer;
+        showSlides(slideIndex);
+        autoSlides();
+
+        function plusSlides(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex += n);
+            autoSlides();
+        }
+
+        window.plusSlides = plusSlides;
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex = n);
+            autoSlides();
+        }
+
+        window.currentSlide = currentSlide;
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove("active");
+            }
+
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].classList.remove("active");
+            }
+
+            if (slides[slideIndex - 1]) {
+                slides[slideIndex - 1].classList.add("active");
+            }
+            if (dots[slideIndex - 1]) {
+                dots[slideIndex - 1].classList.add("active");
+            }
+        }
+
+        function autoSlides() {
+            slideTimer = setTimeout(() => {
+                slideIndex++;
+                showSlides(slideIndex);
+                autoSlides();
+            }, 5000); // Change slide every 5 seconds
+        }
+
+        // Scroll to next section function
+        function scrollToNextSection() {
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                statsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        window.scrollToNextSection = scrollToNextSection;
+    });
+</script>
+{% endblock %}

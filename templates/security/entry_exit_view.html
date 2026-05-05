@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Entry/Exit View - Main Gate Security{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 1.5rem; max-width: 1800px;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2 style="color: white; margin: 0; font-size: 2rem; font-weight: 700;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="vertical-align: middle; margin-right: 0.75rem;">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Main Gate Security - IN/OUT View
+            </h2>
+            <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0; font-size: 1rem;">Separate view of entries and
+                exits
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('security.dashboard') }}" class="btn btn-secondary"
+                style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Two Column Layout for IN and OUT -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- IN Entries Column -->
+        <div class="card"
+            style="background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(36, 36, 62, 0.95)); border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div class="card-body" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3
+                        style="color: #10b981; margin: 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                        </svg>
+                        Entries (IN)
+                    </h3>
+                    <span id="inCount"
+                        style="background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">0</span>
+                </div>
+
+                <div id="inList" style="max-height: 600px; overflow-y: auto; padding-right: 0.5rem;">
+                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Loading IN entries...
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUT Entries Column -->
+        <div class="card"
+            style="background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(36, 36, 62, 0.95)); border: 1px solid rgba(239, 68, 68, 0.3);">
+            <div class="card-body" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3
+                        style="color: #ef4444; margin: 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Exits (OUT)
+                    </h3>
+                    <span id="outCount"
+                        style="background: #ef4444; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">0</span>
+                </div>
+
+                <div id="outList" style="max-height: 600px; overflow-y: auto; padding-right: 0.5rem;">
+                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Loading OUT entries...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        min-height: 100vh;
+    }
+
+    /* Custom scrollbar for IN list */
+    #inList::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #inList::-webkit-scrollbar-track {
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 4px;
+    }
+
+    #inList::-webkit-scrollbar-thumb {
+        background: #10b981;
+        border-radius: 4px;
+    }
+
+    #inList::-webkit-scrollbar-thumb:hover {
+        background: #059669;
+    }
+
+    /* Custom scrollbar for OUT list */
+    #outList::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #outList::-webkit-scrollbar-track {
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 4px;
+    }
+
+    #outList::-webkit-scrollbar-thumb {
+        background: #ef4444;
+        border-radius: 4px;
+    }
+
+    #outList::-webkit-scrollbar-thumb:hover {
+        background: #dc2626;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+<script>
+    const inList = document.getElementById('inList');
+    const outList = document.getElementById('outList');
+    const inCount = document.getElementById('inCount');
+    const outCount = document.getElementById('outCount');
+
+    // Load today's tracking data
+    async function loadEntryExitData() {
+        try {
+            const response = await fetch('/security/api/student-tracking');
+            const data = await response.json();
+
+            if (data.success) {
+                // Separate IN and OUT entries
+                const inEntries = data.tracking.filter(record => record.entry_type === 'IN');
+                const outEntries = data.tracking.filter(record => record.entry_type === 'OUT');
+
+                // Update counts
+                inCount.textContent = inEntries.length;
+                outCount.textContent = outEntries.length;
+
+                // Render IN entries
+                if (inEntries.length === 0) {
+                    inList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No entries yet today.</p>';
+                } else {
+                    let inHtml = '';
+                    inEntries.forEach(record => {
+                        inHtml += `
+                            <div style="padding: 1rem; margin-bottom: 0.75rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border-radius: 12px; border-left: 4px solid #10b981;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div style="flex: 1;">
+                                        <strong style="color: #10b981; font-size: 1.1rem;">${record.name}</strong>
+                                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">
+                                            ${record.registration_id} • ${record.role}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: #10b981; font-weight: bold; font-size: 1rem;">${record.time}</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem;">${record.location}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    inList.innerHTML = inHtml;
+                }
+
+                // Render OUT entries
+                if (outEntries.length === 0) {
+                    outList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No exits yet today.</p>';
+                } else {
+                    let outHtml = '';
+                    outEntries.forEach(record => {
+                        outHtml += `
+                            <div style="padding: 1rem; margin-bottom: 0.75rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)); border-radius: 12px; border-left: 4px solid #ef4444;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div style="flex: 1;">
+                                        <strong style="color: #ef4444; font-size: 1.1rem;">${record.name}</strong>
+                                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">
+                                            ${record.registration_id} • ${record.role}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: #ef4444; font-weight: bold; font-size: 1rem;">${record.time}</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem;">${record.location}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    outList.innerHTML = outHtml;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading entry/exit data:', error);
+            inList.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 2rem;">Error loading data</p>';
+            outList.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 2rem;">Error loading data</p>';
+        }
+    }
+
+    // Load on page load
+    loadEntryExitData();
+
+    // Refresh every 30 seconds
+    setInterval(loadEntryExitData, 30000);
+</script>
+{% endblock %}

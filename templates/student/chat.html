@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Clean Background -->
+<div class="chat-background"></div>
+
+<div class="chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <div class="bot-info">
+            <div class="bot-avatar">
+                <img src="{{ url_for('static', filename='images/chatbot_avatar.png') }}" alt="AI">
+            </div>
+            <div>
+                <h1>GSC Hassan AI Assistant</h1>
+                <p>Always here to help</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- Welcome Message -->
+        <div class="message bot-message">
+            <div class="message-avatar">
+                <img src="{{ url_for('static', filename='images/chatbot_avatar.png') }}" alt="Bot">
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>Hello <strong>{{ current_user.full_name }}</strong>!</p>
+                    <p>I'm your Government Science College ( Autonomous ) Hassan AI assistant. I can help you with:</p>
+                    <ul>
+                        <li>Event information and schedules</li>
+                        <li>Department details</li>
+                        <li>Faculty information</li>
+                        <li>General campus queries</li>
+                    </ul>
+                    <p>How can I assist you today?</p>
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+
+<style>
+    /* Background */
+    .chat-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        z-index: -1;
+    }
+
+    /* Container */
+    .chat-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        height: calc(100vh - 100px);
+        min-height: 650px; /* Prevent squishing on small screens */
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        box-sizing: border-box;
+    }
+
+    /* Chat Header */
+    .chat-header {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .bot-info {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .bot-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .bot-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .bot-info h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .bot-info p {
+        color: #64748b;
+        font-size: 0.9375rem;
+    }
+
+    .chat-messages {
+        flex: 1;
+        min-height: 200px;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        overflow-y: auto;
+    }
+
+    .message {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .message.user-message {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-message .message-avatar {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    .message-content {
+        max-width: 70%;
+    }
+
+    .user-message .message-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .message-bubble {
+        padding: 1rem 1.5rem;
+        border-radius: 16px;
+        word-wrap: break-word;
+    }
+
+    .bot-message .message-bubble {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border-bottom-left-radius: 4px;
+    }
+
+    .user-message .message-bubble {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-bubble ul {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+    }
+
+    .message-bubble li {
+        margin: 0.25rem 0;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        padding: 0.25rem 0.5rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Chat Input */
+    .chat-input {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        gap: 1rem;
+        flex-shrink: 0;
+    }
+
+    .chat-input input {
+        flex: 1;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .chat-input input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .chat-input button {
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .chat-input button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Scrollbar */
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chat-container {
+            padding: 1rem;
+        }
+
+        .chat-header {
+            padding: 1.25rem;
+        }
+
+        .bot-info h1 {
+            font-size: 1.25rem;
+        }
+
+        .message-content {
+            max-width: 85%;
+        }
+
+        .chat-input {
+            flex-direction: column;
+        }
+
+        .chat-input button {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+
+        if (isUser) {
+            avatar.textContent = '{{ current_user.full_name[0].upper() }}';
+        } else {
+            const img = document.createElement('img');
+            img.src = "{{ url_for('static', filename='images/chatbot_avatar.png') }}";
+            img.alt = 'Bot';
+            avatar.appendChild(img);
+        }
+
+        const content = document.createElement('div');
+        content.className = 'message-content';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        bubble.textContent = message;
+
+        const time = document.createElement('div');
+        time.className = 'message-time';
+        const now = new Date();
+        time.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+        content.appendChild(bubble);
+        content.appendChild(time);
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, true);
+        chatInput.value = '';
+
+        try {
+            const response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            addMessage(data.response, false);
+        } catch (error) {
+            addMessage('Sorry, I encountered an error. Please try again.', false);
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+{% endblock %}

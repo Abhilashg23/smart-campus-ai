@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Faculty Feedback - Smart Campus{% endblock %}
+{% block content %}
+<style>
+.fb-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.fb-hero { background: linear-gradient(135deg, #db2777, #9333ea); border-radius: 24px; padding: 2.5rem 3rem; color: white; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.fb-hero h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 0.4rem 0; }
+.fb-hero p  { opacity: 0.85; margin: 0 0 1.25rem 0; }
+.fb-hero .bg-icon { position: absolute; right: -10px; bottom: -20px; font-size: 12rem; color: rgba(255,255,255,0.06); transform: rotate(-10deg); }
+.fb-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+.fb-stat { background: white; border-radius: 20px; padding: 1.75rem; text-align: center; border: 1px solid #e8edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+.fb-stat h2 { font-size: 2.5rem; font-weight: 800; margin: 0 0 0.25rem 0; color: #0f172a; }
+.fb-stat p { margin: 0; color: #94a3b8; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.star-display { color: #f59e0b; font-size: 1.1rem; }
+.star-empty { color: #e2e8f0; }
+.card { background: white; border-radius: 20px; border: 1px solid #e8edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.05); margin-bottom: 2rem; overflow: hidden; }
+.card-head { padding: 1.25rem 1.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #0f172a; font-size: 1.05rem; display: flex; justify-content: space-between; align-items: center; }
+.rating-bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.rating-bar-fill { height: 8px; border-radius: 100px; background: #f59e0b; }
+.rating-bar-track { flex: 1; height: 8px; border-radius: 100px; background: #f1f5f9; overflow: hidden; }
+.fb-comment { padding: 1rem 1.75rem; border-bottom: 1px solid #f8fafc; }
+.fb-comment:last-child { border: none; }
+.fb-badge { padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.78rem; font-weight: 700; }
+.back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.15); color: white; padding: 0.6rem 1.25rem; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.25); }
+</style>
+<div class="fb-wrap">
+    <!-- Hero -->
+    <div class="fb-hero">
+        <div style="position:relative;z-index:2;">
+            <h1><i class="fas fa-star" style="margin-right:8px;"></i>Student Feedback</h1>
+            <p>See what students say about your teaching</p>
+            <a href="{{ url_for('faculty.dashboard') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+        <i class="fas fa-comments bg-icon"></i>
+    </div>
+
+    <!-- Stats -->
+    <div class="fb-stat-row">
+        <div class="fb-stat">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">
+                {% for i in range(1, 6) %}
+                <i class="fas fa-star" style="color:{% if i <= overall_avg %}#f59e0b{% else %}#e2e8f0{% endif %}; font-size:1.4rem;"></i>
+                {% endfor %}
+            </div>
+            <h2>{{ overall_avg }}</h2>
+            <p>Overall Rating</p>
+        </div>
+        <div class="fb-stat">
+            <h2>{{ total_responses }}</h2>
+            <p>Total Responses</p>
+        </div>
+        <div class="fb-stat">
+            <h2>{{ feedback_data|length }}</h2>
+            <p>Subjects Rated</p>
+        </div>
+    </div>
+
+    <!-- Per Subject Breakdown -->
+    {% if feedback_data %}
+    {% for item in feedback_data %}
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <span style="font-family:monospace;font-size:0.8rem;color:#4f46e5;margin-right:0.5rem;">{{ item.subject.code }}</span>
+                {{ item.subject.name }}
+                <span style="margin-left:0.75rem;background:#e0e7ff;color:#4f46e5;font-size:0.78rem;padding:0.2rem 0.6rem;border-radius:6px;font-weight:600;">Sem {{ item.subject.semester }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span style="font-size:1.5rem;font-weight:800;color:#f59e0b;">{{ item.avg_rating }}</span>
+                <span style="color:#64748b;font-size:0.85rem;">/ 5 &nbsp;({{ item.count }} response{{ 's' if item.count != 1 }})</span>
+            </div>
+        </div>
+
+        <!-- Rating breakdown bars -->
+        <div style="padding:1.25rem 1.75rem;border-bottom:1px solid #f1f5f9;">
+            {% for star in [5, 4, 3, 2, 1] %}
+            <div class="rating-bar-row">
+                <span style="font-size:0.8rem;color:#64748b;width:20px;text-align:right;">{{ star }}</span>
+                <i class="fas fa-star" style="color:#f59e0b;font-size:0.75rem;"></i>
+                <div class="rating-bar-track">
+                    <div class="rating-bar-fill" style="width:{{ ((item.rating_counts[star] / item.count) * 100)|round|int if item.count else 0 }}%;"></div>
+                </div>
+                <span style="font-size:0.8rem;color:#64748b;width:24px;">{{ item.rating_counts[star] }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Individual comments -->
+        {% for fb in item.feedbacks %}
+        {% if fb.comments %}
+        <div class="fb-comment">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                <span style="font-size:0.85rem;font-weight:600;color:#0f172a;">{{ fb.student.full_name }}</span>
+                <div>
+                    {% for i in range(1, 6) %}
+                    <i class="fas fa-star" style="color:{% if i <= fb.rating %}#f59e0b{% else %}#e2e8f0{% endif %};font-size:0.8rem;"></i>
+                    {% endfor %}
+                    <span style="font-size:0.75rem;color:#94a3b8;margin-left:0.5rem;">{{ fb.created_at.strftime('%d %b %Y') }}</span>
+                </div>
+            </div>
+            <p style="margin:0;color:#475569;font-size:0.9rem;line-height:1.5;">"{{ fb.comments }}"</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div style="background:white;border-radius:20px;padding:4rem;text-align:center;border:1px dashed #cbd5e1;">
+        <i class="fas fa-comment-slash" style="font-size:3rem;color:#cbd5e1;display:block;margin-bottom:1rem;"></i>
+        <h3 style="color:#475569;margin:0 0 0.5rem 0;">No feedback yet</h3>
+        <p style="color:#94a3b8;margin:0;">Students haven't submitted feedback for your subjects yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

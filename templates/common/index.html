@@ -1,0 +1,645 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Campus - Government Science College (Autonomous) Hassan{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Premium Smart Campus Animations & Theme (Light Version) */
+    :root {
+        --accent-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+        --neon-primary: #4f46e5;
+        --neon-secondary: #06b6d4;
+    }
+
+    body {
+        background-color: #f8fafc;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+        color: #1e293b;
+        overflow-x: hidden;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes pulseGlow {
+        0% { box-shadow: 0 0 15px rgba(79,70,229,0.1); }
+        50% { box-shadow: 0 0 30px rgba(79,70,229,0.25); }
+        100% { box-shadow: 0 0 15px rgba(79,70,229,0.1); }
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+        40% { transform: translateY(-15px) translateX(-50%); }
+        60% { transform: translateY(-7px) translateX(-50%); }
+    }
+
+    .scroll-down-arrow {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+        color: white;
+        z-index: 10;
+        animation: bounce 2s infinite;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+    }
+    .scroll-down-arrow:hover {
+        opacity: 1;
+        color: var(--neon-secondary);
+    }
+        100% { box-shadow: 0 0 15px rgba(79,70,229,0.1); }
+    }
+
+    /* Hero Carousel Enhancements */
+    .hero-wrapper {
+        position: relative;
+        height: 80vh;
+        min-height: 600px;
+        overflow: hidden;
+    }
+
+    .hero-slide {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 5%;
+    }
+
+    .hero-slide.active {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    .hero-slide-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: -2;
+        transform: scale(1.05);
+        transition: transform 6s ease-out;
+    }
+
+    .hero-slide.active .hero-slide-bg {
+        transform: scale(1);
+    }
+
+    .hero-slide-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        /* Dark overlay for hero images so white text is visible */
+        background: linear-gradient(90deg, rgba(11,11,19,0.95) 0%, rgba(11,11,19,0.5) 50%, transparent 100%);
+        z-index: -1;
+    }
+
+    .hero-content-box {
+        max-width: 650px;
+        transform: translateY(30px);
+        opacity: 0;
+        transition: all 1s ease 0.3s;
+    }
+
+    .hero-slide.active .hero-content-box {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin: 1.5rem 0;
+        color: white; /* kept white because of dark overlay */
+        text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        letter-spacing: -1px;
+    }
+
+    .hero-desc {
+        color: #e5e7eb; /* kept light because of dark overlay */
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Controls */
+    .slider-controls {
+        position: absolute;
+        bottom: 3rem;
+        left: 5%;
+        z-index: 10;
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.4);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .slider-dot.active {
+        background: var(--neon-primary);
+        transform: scale(1.3);
+        box-shadow: 0 0 10px var(--neon-primary);
+    }
+
+    .section-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .section-subtitle {
+        color: #475569;
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.6rem 1.2rem;
+        background: rgba(79, 70, 229, 0.1);
+        border: 1px solid rgba(79, 70, 229, 0.2);
+        color: #4f46e5;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 1rem;
+        box-shadow: var(--accent-glow);
+    }
+
+    .badge-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .badge-modern:hover {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+        color: #4f46e5;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Cards */
+    .smart-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 20px;
+        padding: 3rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        backdrop-filter: blur(10px);
+    }
+
+    .smart-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+        transition: 0.5s;
+    }
+
+    .smart-card:hover::before {
+        left: 100%;
+    }
+
+    .smart-card:hover {
+        transform: translateY(-10px);
+        background: #ffffff;
+        border-color: rgba(79, 70, 229, 0.2);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1), var(--accent-glow);
+    }
+
+    .smart-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(79,70,229,0.1) 0%, rgba(6,182,212,0.1) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #4f46e5;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(79, 70, 229, 0.2);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Layout Grids */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 3rem;
+    }
+    
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+    }
+
+    /* Animate on scroll utility classes */
+    .reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+        background: linear-gradient(to right, #4f46e5, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 200% auto;
+        animation: gradientShift 5s ease infinite;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .hero-slide-overlay {
+            background: linear-gradient(90deg, rgba(11,11,19,0.95) 0%, rgba(11,11,19,0.85) 60%, rgba(11,11,19,0.4) 100%);
+        }
+        .section-title {
+            font-size: 2.2rem;
+        }
+        .smart-card {
+            padding: 2rem 1.5rem !important;
+        }
+        .hero-content-box {
+            padding-top: 3rem;
+        }
+        .slider-controls {
+            bottom: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Modern Hero Wrapper -->
+<div class="hero-wrapper">
+    <!-- Slide 1 -->
+    <div class="hero-slide active">
+        <div class="hero-slide-bg" style="background-image: url('{{ url_for('static', filename='images/slides/Main_Block.jpeg') }}')"></div>
+        <div class="hero-slide-overlay"></div>
+        <div class="hero-content-box">
+            <span class="badge" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: #fff;"><i class="fas fa-university"></i> Government Science College</span>
+            <h1 class="hero-title">Shaping Ideals,<br>Fostering Ideas.</h1>
+            <p class="hero-desc">
+                Experience the future of education at Government Science College (Autonomous) Hassan.
+                Integrating high-tech automation with academic excellence since 1946.
+            </p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 1rem 2.5rem; border-radius: 8px; font-weight: 600;">Get Started <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+        </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="hero-slide">
+        <div class="hero-slide-bg" style="background-image: url('{{ url_for('static', filename='images/slides/BCA_Block.jpeg') }}')"></div>
+        <div class="hero-slide-overlay"></div>
+        <div class="hero-content-box">
+            <span class="badge" style="background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.3); color: #22d3ee;"><i class="fas fa-microchip"></i> AI-Powered Campus</span>
+            <h1 class="hero-title">Smart Education<br>Ecosystem</h1>
+            <p class="hero-desc">
+                Seamlessly blending technology with learning. From smart attendance tracking to AI-driven campus monitoring, we provide a state-of-the-art environment.
+            </p>
+            <a href="#programs" class="btn btn-primary" style="padding: 1rem 2.5rem; border-radius: 8px; font-weight: 600; background: #06b6d4; border-color: #06b6d4;">Explore Programs</a>
+        </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="hero-slide">
+        <div class="hero-slide-bg" style="background-image: url('{{ url_for('static', filename='images/slides/Sports_Arena.jpeg') }}')"></div>
+        <div class="hero-slide-overlay"></div>
+        <div class="hero-content-box">
+            <span class="badge" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); color: #34d399;"><i class="fas fa-running"></i> Holistic Development</span>
+            <h1 class="hero-title">Excellence Beyond<br>Academics</h1>
+            <p class="hero-desc">
+                A rich tradition of sports, athletics, and extracurricular activities ensuring physical, mental, and spiritual development of our students.
+            </p>
+            <a href="#about" class="btn btn-primary" style="padding: 1rem 2.5rem; border-radius: 8px; font-weight: 600; background: #10b981; border-color: #10b981;">Our History</a>
+        </div>
+    </div>
+
+    <div class="slider-controls">
+        <div class="slider-dot active" onclick="goToSlide(0)"></div>
+        <div class="slider-dot" onclick="goToSlide(1)"></div>
+        <div class="slider-dot" onclick="goToSlide(2)"></div>
+    </div>
+
+    <!-- Blinking Scroll Down Arrow -->
+    <a href="#smart-campus" class="scroll-down-arrow">
+        <i class="fas fa-chevron-down"></i>
+    </a>
+</div>
+
+<!-- Smart Campus & Events Section -->
+<section id="smart-campus" style="padding: 6rem 0; position: relative;">
+    <div class="container">
+        <div class="grid-2">
+            <!-- Smart Campus Box -->
+            <div class="smart-card reveal" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center;">
+                <div class="badge" style="width: fit-content;"><i class="fas fa-microchip"></i> Smart Campus</div>
+                <h3 style="font-size: 2rem; color: #1e293b; margin-bottom: 1rem; font-weight: 700;">Future-Ready Infrastructure</h3>
+                <p style="color: #475569; font-size: 1.1rem; line-height: 1.7;">
+                    Our AI-powered Smart Campus provides a seamless educational experience. Featuring automated attendance via facial recognition, real-time campus monitoring, digital marks configuration, and intuitive dashboards for students and faculty. Experience unparalleled connectivity and efficiency.
+                </p>
+            </div>
+
+            <!-- Events Box -->
+            <div class="smart-card reveal" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; animation-delay: 0.2s;">
+                <div class="badge" style="width: fit-content; background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.2); color: #06b6d4;"><i class="fas fa-calendar-alt"></i> Latest Events</div>
+                <h3 style="font-size: 2rem; color: #1e293b; margin-bottom: 1rem; font-weight: 700;">Campus Happenings</h3>
+                <p style="color: #475569; font-size: 1.1rem; line-height: 1.7;">
+                    Stay updated with the latest academic and cultural events. From national science symposiums and tech hackathons to annual sports meets and cultural fests, our dynamic campus life ensures holistic development for every student.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About College Section -->
+<section id="about" style="padding: 8rem 0; position: relative;">
+    <div style="position: absolute; top: 10%; right: 5%; width: 300px; height: 300px; background: rgba(79, 70, 229, 0.1); filter: blur(100px); border-radius: 50%;"></div>
+    <div class="container reveal">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <span class="badge"><i class="fas fa-landmark" style="margin-right: 8px;"></i> Our Heritage</span>
+            <br>
+            <h2 class="section-title">About College</h2>
+        </div>
+        <div class="smart-card" style="max-width: 1000px; margin: 0 auto; padding: 4rem;">
+            <div style="font-size: 1.15rem; line-height: 1.9; color: #475569; text-align: justify; display: flex; flex-direction: column; gap: 1.5rem;">
+                <p>
+                    <span style="font-size: 1.5rem; color: #1e293b; font-weight: 600;">Established</span> in 1946, Government Science College (Autonomous) Hassan has grown into a premier institution for higher education. Originally inaugurated by the Maharaja of Mysore, the college was upgraded over the decades and currently accommodates thousands of students across diverse science disciplines. Today, we are proud to be NAAC accredited with a B Grade, holding autonomous status while offering cutting-edge B.Sc. and M.Sc. programs that blend rich heritage with modern innovation.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vision & Mission Section -->
+<section id="vision-mission" style="padding: 4rem 0 8rem 0; position: relative;">
+    <div style="position: absolute; bottom: 10%; left: 5%; width: 400px; height: 400px; background: rgba(6, 182, 212, 0.08); filter: blur(120px); border-radius: 50%;"></div>
+    <div class="container reveal">
+        <div class="grid-2">
+            <!-- Vision -->
+            <div class="smart-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <div class="smart-icon"><i class="fas fa-eye"></i></div>
+                <h3 style="font-size: 2.2rem; color: #1e293b; margin-bottom: 1.5rem; font-weight: 700;">Vision</h3>
+                <p class="gradient-text" style="font-size: 1.8rem; font-weight: 700; line-height: 1.4; font-style: italic;">
+                    "Education with Excellence and Discipline"
+                </p>
+            </div>
+
+            <!-- Mission -->
+            <div class="smart-card">
+                <div class="smart-icon" style="animation-delay: 1s;"><i class="fas fa-bullseye"></i></div>
+                <h3 style="font-size: 2.2rem; color: #1e293b; margin-bottom: 2rem; font-weight: 700;">Mission</h3>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.2rem;">
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Imparting higher education in pure and applied sciences.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Improve thinking capacity and analytical aptitude in students.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Physical, mental and spiritual development in students.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Amalgamating of cultural and ethical values in higher education with rural folk.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Enhancing social awareness and responsibilities of the students by community oriented activities.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Inculcating leadership quality and patriotism among the student community. Utmost priority to national integration.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <i class="fas fa-check-circle" style="color: #06b6d4; margin-top: 5px;"></i>
+                        <span style="color: #475569; line-height: 1.6;">Providing avenues for knowledge exchange.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Departments & Programs Section -->
+<section id="programs" style="padding: 4rem 0 8rem 0; position: relative;">
+    <div class="container reveal">
+        <div style="text-align: center; margin-bottom: 5rem;">
+            <span class="badge"><i class="fas fa-graduation-cap" style="margin-right: 8px;"></i> Academic Excellence</span>
+            <br>
+            <h2 class="section-title">Programmes Offered</h2>
+            <p class="section-subtitle">Comprehensive education across diverse scientific disciplines powered by advanced learning ecosystems.</p>
+        </div>
+
+        <div class="grid-3">
+            <!-- M.Sc -->
+            <div class="smart-card">
+                <div class="smart-icon"><i class="fas fa-flask"></i></div>
+                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; color: #1e293b;">M.Sc Chemistry (CBCS)</h3>
+                <p style="color: #475569; font-size: 0.95rem; line-height: 1.8;">
+                    Advanced postgraduate research and specialization in chemical sciences, bridging the gap between theory and industrial application.
+                </p>
+            </div>
+
+            <!-- BCA -->
+            <div class="smart-card">
+                <div class="smart-icon" style="animation-delay: 0.5s;"><i class="fas fa-laptop-code"></i></div>
+                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; color: #1e293b;">BCA (NEP - 2020)</h3>
+                <p style="color: #475569; font-size: 0.95rem; line-height: 1.8;">
+                    Bachelor of Computer Applications - Shaping future tech leaders with coding, software engineering, and modern web technologies.
+                </p>
+            </div>
+            
+            <!-- Sports -->
+            <div class="smart-card">
+                <div class="smart-icon" style="animation-delay: 1s;"><i class="fas fa-running"></i></div>
+                <h3 style="margin-bottom: 1rem; font-size: 1.5rem; color: #1e293b;">Sports & Athletics</h3>
+                <p style="color: #475569; font-size: 0.95rem; line-height: 1.8;">
+                    State-of-the-art sports complex offering Olympic-track, modern gymnasium, and professional coaching.
+                </p>
+            </div>
+        </div>
+
+        <!-- B.Sc Programs Full Width -->
+        <div class="smart-card" style="margin-top: 3rem; padding: 4rem;">
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="smart-icon" style="margin-bottom: 0; animation: none;"><i class="fas fa-microscope"></i></div>
+                <div>
+                    <h3 style="font-size: 2rem; color: #1e293b; margin: 0;">B.Sc Combinations</h3>
+                    <p style="color: #475569; margin: 0.5rem 0 0 0;">Comprehensive specialized combinations across all major scientific disciplines.</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.5rem;">
+                <span class="badge-modern"><i class="fas fa-atom"></i> Physics & Mathematics (PM)</span>
+                <span class="badge-modern"><i class="fas fa-atom"></i> Physics & Chemistry (PC)</span>
+                <span class="badge-modern"><i class="fas fa-laptop"></i> Physics & Computer Science (PCs)</span>
+                <span class="badge-modern"><i class="fas fa-microchip"></i> Physics & Electronics (PE)</span>
+                <span class="badge-modern"><i class="fas fa-calculator"></i> Mathematics & Computer Science (MCs)</span>
+                <span class="badge-modern"><i class="fas fa-calculator"></i> Mathematics & Electronics (ME)</span>
+                <span class="badge-modern"><i class="fas fa-calculator"></i> Mathematics & Chemistry (MC)</span>
+                <span class="badge-modern"><i class="fas fa-laptop"></i> Electronics & Computer Science (ECs)</span>
+                <span class="badge-modern"><i class="fas fa-leaf"></i> Botany & Zoology (BZ)</span>
+                <span class="badge-modern"><i class="fas fa-leaf"></i> Botany & Chemistry (BC)</span>
+                <span class="badge-modern"><i class="fas fa-paw"></i> Zoology & Chemistry (ZC)</span>
+                <span class="badge-modern"><i class="fas fa-dna"></i> Biotechnology & Chemistry (BtC)</span>
+                <span class="badge-modern"><i class="fas fa-leaf"></i> Botany & Biochemistry (BBc)</span>
+                <span class="badge-modern"><i class="fas fa-paw"></i> Zoology & Biotechnology (ZBt)</span>
+                <span class="badge-modern"><i class="fas fa-bacterium"></i> Microbiology & Biotechnology (MbBt)</span>
+                <span class="badge-modern"><i class="fas fa-dna"></i> Biotechnology & Biochemistry (BtBC)</span>
+                <span class="badge-modern"><i class="fas fa-bacterium"></i> Microbiology & Biochemistry (MbBc)</span>
+                <span class="badge-modern"><i class="fas fa-bacterium"></i> Microbiology & Botany (MbB)</span>
+                <span class="badge-modern"><i class="fas fa-flask"></i> Biochemistry & Zoology (BCZ)</span>
+                <span class="badge-modern"><i class="fas fa-dna"></i> Biotechnology & Botany (BBT)</span>
+                <span class="badge-modern"><i class="fas fa-paw"></i> Zoology & Microbiology (ZMB)</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section style="padding: 6rem 0; border-top: 1px solid rgba(0,0,0,0.05); background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(79, 70, 229, 0.05) 100%);">
+    <div class="container reveal">
+        <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); text-align: center;">
+            <div class="smart-card" style="padding: 2.5rem 1.5rem;">
+                <div class="gradient-text" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem;">40+</div>
+                <div style="color: #475569; font-size: 1.1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Years of Legacy</div>
+            </div>
+            <div class="smart-card" style="padding: 2.5rem 1.5rem;">
+                <div class="gradient-text" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem;">5000+</div>
+                <div style="color: #475569; font-size: 1.1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Active Students</div>
+            </div>
+            <div class="smart-card" style="padding: 2.5rem 1.5rem;">
+                <div class="gradient-text" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem;">150+</div>
+                <div style="color: #475569; font-size: 1.1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Expert Faculty</div>
+            </div>
+            <div class="smart-card" style="padding: 2.5rem 1.5rem;">
+                <div class="gradient-text" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 0.5rem;">10+</div>
+                <div style="color: #475569; font-size: 1.1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Science Labs</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Modern Hero Slider
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.slider-dot');
+
+    function goToSlide(index) {
+        slides[currentSlide].classList.remove('active');
+        if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+    }
+
+    function nextSlide() {
+        goToSlide((currentSlide + 1) % slides.length);
+    }
+
+    setInterval(nextSlide, 6000);
+
+    // Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Reveal on Scroll Animation
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            var elementVisible = 100;
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add("active");
+            }
+        }
+    }
+    window.addEventListener("scroll", reveal);
+    // Trigger once on load
+    reveal();
+</script>
+{% endblock %}

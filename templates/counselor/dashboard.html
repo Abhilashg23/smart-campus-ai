@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Counselor Dashboard - Student Well-being{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+        --card-bg: rgba(30, 41, 59, 0.7);
+    }
+
+    body {
+        background-color: #0f172a;
+        background-image:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    .dashboard-container {
+        padding: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    .glass-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.02em;
+    }
+
+    .student-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .student-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .student-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-img-container {
+        position: relative;
+    }
+
+    .profile-img {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-badge {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ef4444;
+        border: 3px solid #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+    }
+
+    .info-label {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #f8fafc;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .emotion-timeline {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: auto;
+        padding-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .emotion-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .emotion-sad {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .emotion-neutral {
+        background: rgba(148, 163, 184, 0.15);
+        color: #cbd5e1;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .emotion-happy {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-action {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 0.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 1.5rem;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-action:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: radial-gradient(circle at center, rgba(34, 197, 94, 0.05) 0%, transparent 70%);
+        border-radius: 24px;
+        border: 1px dashed rgba(34, 197, 94, 0.2);
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+        <div>
+            <h1 class="section-title">Counselor Overview</h1>
+            <p style="color: #94a3b8; font-size: 1.1rem; margin: 0;">Monitoring student emotional health & well-being
+            </p>
+        </div>
+
+        <div class="glass-card" style="padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="text-align: right;">
+                <div
+                    style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                    Logged in as</div>
+                <div style="font-weight: 600; color: white;">Counselor</div>
+            </div>
+            <div
+                style="width: 40px; height: 40px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-md" style="color: white; font-size: 1.2rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        <div class="glass-card stat-card"
+            style="background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.6)); border-color: rgba(239, 68, 68, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: 700; color: #f87171;" id="alertCount">0</h3>
+                    <div style="color: #cbd5e1; font-weight: 500;">Active Alerts</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border-radius: 12px;">
+                    <i class="fas fa-exclamation-circle" style="color: #f87171; font-size: 1.5rem;"></i>
+                </div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">Students showing consistent sadness (2+ days)</p>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: 700; color: #38bdf8;">--</h3>
+                    <div style="color: #cbd5e1; font-weight: 500;">Total Students</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(56, 189, 248, 0.2); border-radius: 12px;">
+                    <i class="fas fa-users" style="color: #38bdf8; font-size: 1.5rem;"></i>
+                </div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">Currently monitored in the system</p>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: 700; color: #a78bfa;">24h</h3>
+                    <div style="color: #cbd5e1; font-weight: 500;">Monitoring Period</div>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(167, 139, 250, 0.2); border-radius: 12px;">
+                    <i class="fas fa-clock" style="color: #a78bfa; font-size: 1.5rem;"></i>
+                </div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">Real-time emotion analysis active</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: white; margin: 0;">
+            <i class="fas fa-stream" style="margin-right: 0.75rem; color: #ec4899;"></i>Alert Feed
+        </h2>
+        <div style="display: flex; gap: 0.5rem;">
+            <span
+                style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block;"></span>
+            <span
+                style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">Live
+                Updates</span>
+        </div>
+    </div>
+
+    <!-- Students Grid -->
+    <div id="studentsList" class="student-grid">
+        <!-- Loading State -->
+        <div
+            style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem;">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p style="color: #94a3b8; margin-top: 1rem; font-weight: 500;">Analyzing student data streams...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadSadStudents() {
+        try {
+            const response = await fetch('/counselor/api/sad-students');
+            const data = await response.json();
+
+            const listContainer = document.getElementById('studentsList');
+            const alertCount = document.getElementById('alertCount');
+
+            if (data.success) {
+                alertCount.textContent = data.count;
+
+                if (data.count === 0) {
+                    listContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div style="width: 80px; height: 80px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                                <i class="fas fa-check-circle" style="font-size: 2.5rem; color: #22c55e;"></i>
+                            </div>
+                            <h3 style="color: #fff; font-weight: 700; margin-bottom: 0.5rem; font-size: 1.5rem;">All Clear</h3>
+                            <p style="color: #94a3b8; font-size: 1.1rem; max-width: 500px; margin: 0 auto;">
+                                No students have been detected with persistent sadness cues (2+ days). The campus emotional health looks good.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                data.students.forEach(student => {
+                    const profileImg = student.profile_picture ?
+                        (student.profile_picture.startsWith('http') ? student.profile_picture : '/static/' + student.profile_picture) :
+                        'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name) + '&background=0f172a&color=fff&bold=true';
+
+                    html += `
+                        <div class="glass-card stat-card student-card">
+                            <div class="student-header">
+                                <div class="profile-img-container">
+                                    <img src="${profileImg}" alt="${student.name}" class="profile-img">
+                                    <div class="status-badge">
+                                        <i class="fas fa-exclamation" style="color: white; font-size: 0.7rem;"></i>
+                                    </div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h3 style="color: white; margin: 0 0 0.25rem 0; font-size: 1.25rem; font-weight: 700;">${student.name}</h3>
+                                    <div style="color: #ec4899; font-weight: 600; font-size: 0.9rem;">${student.registration_id || 'ID Not Set'}</div>
+                                    <div style="color: #94a3b8; font-size: 0.85rem;">${student.department}</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                <div class="info-row">
+                                    <span class="info-label">Current Streak</span>
+                                    <span class="info-value" style="color: #f87171;">${student.sad_days_count} Days Sad</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Program Year</span>
+                                    <span class="info-value">Year ${student.year || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: auto;">
+                                <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Recent Emotion Log</div>
+                                <div class="emotion-timeline">
+                                    ${student.recent_emotions.map(e => `
+                                        <div class="emotion-badge ${e.emotion === 'sad' ? 'emotion-sad' : (e.emotion === 'happy' ? 'emotion-happy' : 'emotion-neutral')}">
+                                            ${e.emotion.charAt(0).toUpperCase() + e.emotion.slice(1)} <span style="opacity: 0.6; margin-left: 4px;">${new Date(e.date).getDate()}/${new Date(e.date).getMonth() + 1}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <button class="btn-action" onclick="alert('Opening secure communication channel with ${student.name}...')">
+                                    <i class="fas fa-comment-medical" style="margin-right: 0.5rem;"></i>Initiate Contact
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listContainer.innerHTML = html;
+            } else {
+                listContainer.innerHTML = `<div class="empty-state" style="border-color: rgba(239, 68, 68, 0.2);"><h3 style="color: #f87171;">System Error</h3><p>${data.error}</p></div>`;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('studentsList').innerHTML = `<div class="empty-state" style="border-color: rgba(239, 68, 68, 0.2);"><h3 style="color: #f87171;">Connection Failed</h3><p>Unable to reach server.</p></div>`;
+        }
+    }
+
+    // Load data on page load
+    loadSadStudents();
+
+    // Refresh every minute
+    setInterval(loadSadStudents, 60000);
+</script>
+{% endblock %}

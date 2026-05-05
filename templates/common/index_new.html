@@ -1,0 +1,1022 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Campus - Chanakya University{% endblock %}
+
+{% block head %}
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Slideshow Background -->
+<section class="hero-section">
+    <!-- Slideshow Background -->
+    <div class="slideshow-background">
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/hero_bg.png') }}" alt="Smart Campus Future">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/campus_technology.png') }}" alt="Campus Technology">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/ai_education.png') }}" alt="AI Powered Education">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/smart_security.png') }}" alt="Intelligent Security">
+        </div>
+        <div class="slide fade">
+            <img src="{{ url_for('static', filename='images/facial_recognition.png') }}" alt="Biometric Access">
+        </div>
+    </div>
+
+    <!-- Animated Gradient Overlay -->
+    <div class="hero-overlay"></div>
+
+    <!-- Hero Content with Glassmorphism -->
+    <div class="hero-content">
+        <div class="hero-glass-card fade-in-up">
+            <h1 class="hero-title">Where Ideals Reside, and <span class="gradient-text">Ideas Thrive</span></h1>
+            <p class="hero-subtitle">
+                Chanakya University Smart Campus - Transforming education through AI-powered innovation and intelligent
+                automation
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
+                    <span>Get Started</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slideshow Navigation -->
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" onclick="scrollToNextSection()">
+        <div class="scroll-arrow"></div>
+        <span class="scroll-text">Scroll</span>
+    </div>
+
+    <!-- Dots -->
+    <div class="dots-container-hero">
+        <span class="dot" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+        <span class="dot" onclick="currentSlide(4)"></span>
+        <span class="dot" onclick="currentSlide(5)"></span>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card fade-in-up" style="animation-delay: 0s;">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" data-target="67">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.1s;">
+                <div class="stat-icon">🎓</div>
+                <div class="stat-number" data-target="6">0</div>
+                <div class="stat-label">Schools</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.2s;">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-number" data-target="99.9">0</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card fade-in-up" style="animation-delay: 0.3s;">
+                <div class="stat-icon">🤖</div>
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">AI Support</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content fade-in-up">
+                <span class="section-badge">About Chanakya University</span>
+                <h2 class="section-title">Rooted in Ideals, <span class="gradient-text">Ascending with Ideas</span></h2>
+                <p class="section-text">
+                    Chanakya University is a pioneering exemplar of the vision of a Multidisciplinary University as
+                    elucidated in the new National Education Policy (NEP 2020). Established in 2022 through a State
+                    Legislature Act, we are committed to addressing developmental challenges with innovative solutions.
+                </p>
+                <p class="section-text">
+                    Our Smart Campus system leverages AI-powered technology and face recognition to create an
+                    intelligent, automated campus management ecosystem that enhances the educational experience for
+                    students, faculty, and administrators.
+                </p>
+            </div>
+            <div class="about-image fade-in-up" style="animation-delay: 0.2s;">
+                <div class="image-wrapper">
+                    <img src="{{ url_for('static', filename='images/campus_technology.png') }}" alt="Campus Technology">
+                    <div class="image-gradient-overlay"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <span class="section-badge">Smart Campus Features</span>
+            <h2 class="section-title">Intelligent Campus <span class="gradient-text">Management</span></h2>
+            <p class="section-subtitle">Advanced technology for modern educational institutions</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card fade-in-up" style="animation-delay: 0s;">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-content">
+                    <h3>AI-Powered Intelligence</h3>
+                    <p>Leverage Google's Gemini AI to provide instant, accurate responses to student and faculty queries
+                        with natural language processing and context-aware assistance.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.1s;">
+                <div class="feature-icon">🔐</div>
+                <div class="feature-content">
+                    <h3>Biometric Security</h3>
+                    <p>Advanced facial recognition technology ensures secure, contactless attendance tracking and campus
+                        access control with real-time verification.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.2s;">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="feature-content">
+                    <h3>Real-Time Analytics</h3>
+                    <p>Comprehensive dashboards provide actionable insights to track attendance patterns, monitor
+                        engagement, and make data-driven decisions.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.3s;">
+                <div class="feature-icon">📅</div>
+                <div class="feature-content">
+                    <h3>Event Management</h3>
+                    <p>Schedule, organize, and track campus events with automated notifications and seamless
+                        coordination across departments.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.4s;">
+                <div class="feature-icon">💬</div>
+                <div class="feature-content">
+                    <h3>Communication Hub</h3>
+                    <p>Integrated messaging and collaboration tools facilitate seamless communication between students,
+                        faculty, and administration.</p>
+                </div>
+            </div>
+
+            <div class="feature-card fade-in-up" style="animation-delay: 0.5s;">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-content">
+                    <h3>Smart Automation</h3>
+                    <p>Automated workflows reduce administrative workload by 85%, allowing staff to focus on strategic
+                        initiatives and student success.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Schools Section -->
+<section class="schools-section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <span class="section-badge">Academic Excellence</span>
+            <h2 class="section-title">Schools at <span class="gradient-text">Chanakya University</span></h2>
+            <p class="section-subtitle">Programs crafted by renowned academicians</p>
+        </div>
+
+        <div class="schools-grid">
+            <div class="school-card fade-in-up" style="animation-delay: 0s;">
+                <div class="school-icon">⚙️</div>
+                <h3>School of Engineering</h3>
+                <p>Cutting-edge programs in technology and innovation</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.1s;">
+                <div class="school-icon">💼</div>
+                <h3>School of Management Sciences</h3>
+                <p>Leadership and business excellence programs</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.2s;">
+                <div class="school-icon">🎨</div>
+                <h3>School of Arts, Humanities and Social Sciences</h3>
+                <p>Comprehensive liberal arts education</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.3s;">
+                <div class="school-icon">⚖️</div>
+                <h3>School of Law, Governance and Public Policy</h3>
+                <p>Shaping future leaders in law and governance</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.4s;">
+                <div class="school-icon">🔬</div>
+                <h3>School of Mathematics and Natural Sciences</h3>
+                <p>Research-driven scientific education</p>
+            </div>
+
+            <div class="school-card fade-in-up" style="animation-delay: 0.5s;">
+                <div class="school-icon">🧬</div>
+                <h3>School of Biosciences</h3>
+                <p>Advancing life sciences and biotechnology</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>    /* ========================================
+       MODERN DESIGN SYSTEM - CSS VARIABLES
+       ======================================== */
+    :root {
+        /* Color Palette */
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        
+        /* Glassmorphism */
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        
+        /* Typography */
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        
+        /* Shadows */
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+        --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.2);
+        
+        /* Border Radius */
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 32px;
+    }
+
+    /* Global Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-primary);
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        background: #ffffff;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        min-height: 700px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slideshow-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .slideshow-background .slide {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .slideshow-background .slide.active {
+        display: block;
+        animation: zoomIn 1.5s ease-out;
+    }
+
+    .slideshow-background .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @keyframes zoomIn {
+        from {
+            transform: scale(1.1);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%);
+        z-index: 1;
+        animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%);
+        }
+        50% {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.7) 0%, rgba(0, 242, 254, 0.7) 100%);
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 1100px;
+        padding: 2rem;
+    }
+
+    .hero-glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: var(--radius-lg);
+        border: 2px solid var(--glass-border);
+        padding: 4rem 3rem;
+        box-shadow: var(--glass-shadow);
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 5.5rem);
+        font-weight: 900;
+        margin-bottom: 2rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: white;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 1.25rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-primary:hover::before {
+        left: 0;
+    }
+
+    .btn-primary svg {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover svg {
+        transform: translateX(5px);
+    }
+
+    /* Navigation */
+    .prev, .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 24px;
+        transition: all 0.3s ease;
+        border-radius: 50%;
+        user-select: none;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 2px solid var(--glass-border);
+        text-decoration: none;
+        z-index: 10;
+    }
+
+    .prev { left: 2rem; }
+    .next { right: 2rem; }
+
+    .prev:hover, .next:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        animation: bounce 2s infinite;
+    }
+
+    .scroll-arrow {
+        width: 30px;
+        height: 30px;
+        border-left: 3px solid white;
+        border-bottom: 3px solid white;
+        transform: rotate(-45deg);
+    }
+
+    .scroll-text {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateX(-50%) translateY(0);
+        }
+        40% {
+            transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+            transform: translateX(-50%) translateY(-5px);
+        }
+    }
+
+    .dots-container-hero {
+        position: absolute;
+        bottom: 6rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.75rem;
+        z-index: 10;
+    }
+
+    .dot {
+        cursor: pointer;
+        height: 12px;
+        width: 12px;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .dot.active, .dot:hover {
+        background: white;
+        width: 40px;
+        border-radius: 6px;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 5rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: var(--radius-md);
+        border: 2px solid var(--glass-border);
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: var(--glass-shadow);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* About Section */
+    .about-section {
+        padding: 8rem 0;
+        background: linear-gradient(to bottom, #ffffff, #f8fafc);
+        position: relative;
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 5rem;
+        align-items: center;
+    }
+
+    .section-badge {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-radius: 50px;
+        color: #667eea;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.5rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .section-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    .section-text {
+        color: #64748b;
+        line-height: 1.9;
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .image-wrapper {
+        position: relative;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.6s ease;
+    }
+
+    .image-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    .image-gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .image-wrapper:hover .image-gradient-overlay {
+        opacity: 1;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 8rem 0;
+        background: white;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.3rem;
+        color: #64748b;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .feature-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: var(--radius-md);
+        padding: 3rem;
+        border: 2px solid #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+        border-color: #667eea;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+
+    .feature-content h3 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+
+    .feature-content p {
+        color: #64748b;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    /* Schools Section */
+    .schools-section {
+        padding: 8rem 0;
+        background: linear-gradient(to bottom, #f8fafc, #ffffff);
+    }
+
+    .schools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .school-card {
+        background: white;
+        border-radius: var(--radius-md);
+        padding: 3rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .school-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 0;
+    }
+
+    .school-card:hover::before {
+        opacity: 0.05;
+    }
+
+    .school-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+        border-color: #667eea;
+    }
+
+    .school-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .school-card h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .school-card p {
+        color: #64748b;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    .fade-in-up.visible {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .about-grid,
+        .features-grid,
+        .schools-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .hero-glass-card {
+            padding: 2.5rem 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+    }
+</style>
+
+<script>
+    // Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', function () {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in-up, .stat-card, .feature-card, .school-card').forEach((el) => {
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        const animateCounter = (element) => {
+            const target = parseFloat(element.getAttribute('data-target'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target % 1 === 0 ? target : target.toFixed(1);
+                }
+            };
+
+            updateCounter();
+        };
+
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.stat-number[data-target]').forEach(animateCounter);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Slideshow functionality
+        let slideIndex = 1;
+        let slideTimer;
+        showSlides(slideIndex);
+        autoSlides();
+
+        function plusSlides(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex += n);
+            autoSlides();
+        }
+
+        window.plusSlides = plusSlides;
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex = n);
+            autoSlides();
+        }
+
+        window.currentSlide = currentSlide;
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove("active");
+            }
+
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].classList.remove("active");
+            }
+
+            if (slides[slideIndex - 1]) {
+                slides[slideIndex - 1].classList.add("active");
+            }
+            if (dots[slideIndex - 1]) {
+                dots[slideIndex - 1].classList.add("active");
+            }
+        }
+
+        function autoSlides() {
+            slideTimer = setTimeout(() => {
+                slideIndex++;
+                showSlides(slideIndex);
+                autoSlides();
+            }, 5000);
+        }
+
+        // Scroll to next section
+        function scrollToNextSection() {
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                statsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        window.scrollToNextSection = scrollToNextSection;
+    });
+</script>
+{% endblock %}

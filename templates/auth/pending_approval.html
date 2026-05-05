@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Approval - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 3rem;">
+ <div class="card fade-in" style="text-align: center;">
+ <div class="card-header" style="font-size: 2rem;">
+ ⏳ Pending Approval
+ </div>
+ <div class="card-body">
+ <p style="font-size: 1.1rem; margin: 2rem 0;">
+ Your registration is pending approval by an administrator.
+ </p>
+ <p style="color: var(--text-secondary);">
+ You will receive access once your account is approved. Please check back later.
+ </p>
+ <div class="spinner" style="margin: 2rem auto;"></div>
+ </div>
+ </div>
+</div>
+{% endblock %}

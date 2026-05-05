@@ -1,0 +1,1267 @@
+<!-- Floating Chat Widget (IRCTC Style) -->
+<div id="chatWidget" class="chat-widget">
+    <!-- Chat Button -->
+    <button id="chatToggle" class="chat-toggle-btn">
+        <img src="{{ url_for('static', filename='images/chatbot_avatar.png') }}" alt="Chat">
+        <span class="chat-badge" id="chatBadge">1</span>
+
+        <!-- Animated Speech Bubble -->
+        <div class="chat-speech-bubble" id="chatSpeechBubble">
+            <span class="speech-text">How can I help you today?</span>
+        </div>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chatWindow" class="chat-window" style="display: none;">
+        <!-- Header -->
+        <div class="chat-window-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <img src="{{ url_for('static', filename='images/chatbot_avatar.png') }}" alt="Bot"
+                    style="width: 40px; height: 40px; border-radius: 50%;">
+                <div>
+                    <div style="font-weight: 600; font-size: 1rem;">GSC Hassan Assistant</div>
+                    <div style="font-size: 0.75rem; opacity: 0.9;">Online</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button id="anonymousMessageBtn" class="anonymous-message-btn" title="Send Anonymous Message/Complaint">
+                    <i class="fas fa-comment-dots"></i>
+                    <span style="margin-left: 0.35rem; font-size: 0.8rem; font-weight: 500;">Anonymous</span>
+                </button>
+                <button id="chatClose" class="chat-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-window-messages" id="chatWindowMessages">
+            <div class="chat-msg bot-msg">
+                <img src="{{ url_for('static', filename='images/chatbot_avatar.png') }}" class="msg-avatar">
+                <div class="msg-bubble bot-bubble">
+                    {% if current_user.is_authenticated %}
+                    Hello {{ current_user.full_name }}!<br>
+                    {% else %}
+                    Hello! Welcome to Government Science College ( Autonomous ) Hassan smart campus!<br>
+                    {% endif %}
+                    I'm here to help you with information about events, faculty, departments, and more!
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-window-input">
+            <input type="text" id="chatWidgetInput" placeholder="Type your message..." class="chat-widget-input-field">
+            <input type="file" id="chatWidgetImageInput" accept="image/*" style="display: none;">
+            <button id="chatWidgetImage" class="chat-widget-image-btn" title="Upload Image">
+                <i class="fas fa-camera"></i>
+            </button>
+            <button id="chatWidgetVoice" class="chat-widget-voice-btn" title="Voice Input">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="chatWidgetSend" class="chat-widget-send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Anonymous Message Modal -->
+    <div id="anonymousModal" class="anonymous-modal" style="display: none;">
+        <div class="anonymous-modal-content">
+            <div class="anonymous-modal-header">
+                <h3 style="margin: 0; font-size: 1.25rem; color: #333;">
+                    <i class="fas fa-comment-dots" style="color: #667eea;"></i>
+                    Anonymous Message/Complaint
+                </h3>
+                <button id="anonymousModalClose" class="anonymous-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="anonymous-modal-body">
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                    Your message will be sent anonymously to the admin. We value your feedback!
+                </p>
+
+                <div class="form-group">
+                    <label for="anonymousCategory">Category</label>
+                    <select id="anonymousCategory" class="form-control">
+                        <option value="complaint">Complaint</option>
+                        <option value="suggestion">Suggestion</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="anonymousMessage">Your Message</label>
+                    <textarea id="anonymousMessage" class="form-control" rows="6"
+                        placeholder="Please describe your message in detail (minimum 10 characters)..."
+                        maxlength="2000"></textarea>
+                    <small class="char-counter">
+                        <span id="charCount">0</span>/2000 characters
+                    </small>
+                </div>
+
+                <div class="anonymous-modal-footer">
+                    <button id="anonymousSubmitBtn" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Submit Anonymously
+                    </button>
+                    <button id="anonymousCancelBtn" class="btn-cancel">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Chat Widget Styles (IRCTC Style) */
+    .chat-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .chat-toggle-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+        animation: pulse 2s infinite;
+    }
+
+    .chat-toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .chat-toggle-btn img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+    }
+
+    .chat-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #f5576c;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 2px solid white;
+    }
+
+    /* Animated Speech Bubble */
+    .chat-speech-bubble {
+        position: absolute;
+        right: 75px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: white;
+        color: #333;
+        padding: 0.75rem 1.25rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        white-space: nowrap;
+        font-size: 0.9rem;
+        font-weight: 500;
+        animation: speechBubble 3s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .chat-speech-bubble::after {
+        content: '';
+        position: absolute;
+        right: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid white;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+    }
+
+    .speech-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 600;
+    }
+
+    @keyframes speechBubble {
+
+        0%,
+        100% {
+            opacity: 0;
+            transform: translateY(-50%) translateX(-10px);
+        }
+
+        10%,
+        90% {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+    }
+
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 4px 30px rgba(102, 126, 234, 0.7);
+        }
+    }
+
+    .chat-window {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 380px;
+        height: 550px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .chat-window-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .chat-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .anonymous-message-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .anonymous-message-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    /* Anonymous Message Modal */
+    .anonymous-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .anonymous-modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    .anonymous-modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .anonymous-modal-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .anonymous-modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .anonymous-modal-body {
+        padding: 1.5rem;
+        max-height: calc(90vh - 150px);
+        overflow-y: auto;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .char-counter {
+        display: block;
+        text-align: right;
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    .anonymous-modal-footer {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancel {
+        padding: 0.875rem 1.5rem;
+        background: #e9ecef;
+        color: #333;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #dee2e6;
+    }
+
+    .chat-window-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+    }
+
+    .chat-msg {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .chat-msg.user-msg {
+        flex-direction: row-reverse;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .msg-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .msg-bubble {
+        max-width: 80%;
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .bot-bubble {
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .user-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .msg-bubble img {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        display: block;
+    }
+
+    .user-info-card {
+        background: #f8f9fa;
+        border-left: 3px solid #667eea;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .user-info-card .info-row {
+        display: flex;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+        gap: 0.5rem;
+    }
+
+    .user-info-card .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .user-info-card .info-label {
+        font-weight: 600;
+        min-width: 85px;
+        color: #667eea;
+        flex-shrink: 0;
+    }
+
+    .user-info-card .info-value {
+        color: #333;
+        word-break: break-word;
+        flex: 1;
+    }
+
+    .chat-window-input {
+        padding: 1rem;
+        background: white;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .chat-widget-input-field {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 24px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+
+    .chat-widget-input-field:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .chat-widget-send-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .chat-widget-send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .chat-widget-voice-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .chat-widget-voice-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .chat-widget-image-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .chat-widget-image-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .chat-widget-voice-btn.recording {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        animation: recordingPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes recordingPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.8), 0 0 0 8px rgba(239, 68, 68, 0.2);
+        }
+    }
+
+    .typing-indicator {
+        display: flex;
+        gap: 0.3rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+        width: fit-content;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #667eea;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+
+        0%,
+        60%,
+        100% {
+            transform: translateY(0);
+            opacity: 0.5;
+        }
+
+        30% {
+            transform: translateY(-8px);
+            opacity: 1;
+        }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+        .chat-window {
+            width: calc(100vw - 40px);
+            height: calc(100vh - 120px);
+            bottom: 80px;
+            right: 20px;
+        }
+    }
+</style>
+
+<script>
+    // Chat Widget JavaScript
+    (function () {
+        const chatToggle = document.getElementById('chatToggle');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatClose = document.getElementById('chatClose');
+        const chatInput = document.getElementById('chatWidgetInput');
+        const chatSend = document.getElementById('chatWidgetSend');
+        const chatVoice = document.getElementById('chatWidgetVoice');
+        const chatMessages = document.getElementById('chatWindowMessages');
+        const chatBadge = document.getElementById('chatBadge');
+        const chatSpeechBubble = document.getElementById('chatSpeechBubble');
+
+        let isOpen = false;
+        let messageCount = 1;
+        let recognition = null;
+        let isRecording = false;
+
+        // Initialize Web Speech API
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN'; // Indian English
+            recognition.continuous = false; // Single utterance
+            recognition.interimResults = true; // Show interim results
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                chatVoice.classList.add('recording');
+                chatInput.placeholder = 'Listening...';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+
+                // If final result, auto-send after a short delay
+                if (event.results[0].isFinal) {
+                    setTimeout(() => {
+                        if (chatInput.value.trim()) {
+                            sendWidgetMessage();
+                        }
+                    }, 500);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isRecording = false;
+                chatVoice.classList.remove('recording');
+                chatInput.placeholder = 'Type your message...';
+
+                let errorMessage = 'Voice input error. ';
+                switch (event.error) {
+                    case 'no-speech':
+                        errorMessage += 'No speech detected. Please try again.';
+                        break;
+                    case 'audio-capture':
+                        errorMessage += 'No microphone found.';
+                        break;
+                    case 'not-allowed':
+                        errorMessage += 'Microphone permission denied.';
+                        break;
+                    default:
+                        errorMessage += 'Please try again.';
+                }
+
+                // Show error as a temporary message
+                const tempMsg = document.createElement('div');
+                tempMsg.style.cssText = 'position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; z-index: 10000; animation: fadeIn 0.3s ease;';
+                tempMsg.textContent = errorMessage;
+                chatWindow.appendChild(tempMsg);
+
+                setTimeout(() => {
+                    tempMsg.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => tempMsg.remove(), 300);
+                }, 3000);
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                chatVoice.classList.remove('recording');
+                chatInput.placeholder = 'Type your message...';
+            };
+        } else {
+            // Hide voice button if not supported
+            chatVoice.style.display = 'none';
+        }
+
+        // Voice button click handler
+        if (chatVoice && recognition) {
+            chatVoice.addEventListener('click', () => {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Failed to start recognition:', error);
+                    }
+                }
+            });
+        }
+
+        // Toggle chat window
+        chatToggle.addEventListener('click', () => {
+            isOpen = !isOpen;
+            chatWindow.style.display = isOpen ? 'flex' : 'none';
+
+            // Hide speech bubble when chat is open
+            if (chatSpeechBubble) {
+                chatSpeechBubble.style.display = isOpen ? 'none' : 'block';
+            }
+
+            if (isOpen) {
+                chatBadge.style.display = 'none';
+                chatInput.focus();
+                loadChatHistory();
+            }
+        });
+
+        chatClose.addEventListener('click', () => {
+            isOpen = false;
+            chatWindow.style.display = 'none';
+
+            // Show speech bubble when chat is closed
+            if (chatSpeechBubble) {
+                chatSpeechBubble.style.display = 'block';
+            }
+        });
+
+        // Add message to chat
+        function addWidgetMessage(message, isUser = false, imageUrl = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-msg ${isUser ? 'user-msg' : 'bot-msg'}`;
+
+            if (!isUser) {
+                const avatar = document.createElement('img');
+                avatar.src = "{{ url_for('static', filename='images/chatbot_avatar.png') }}";
+                avatar.className = 'msg-avatar';
+                msgDiv.appendChild(avatar);
+            }
+
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble ${isUser ? 'user-bubble' : 'bot-bubble'}`;
+            bubble.textContent = message;
+
+            // Add profile image if provided
+            if (imageUrl && !isUser) {
+                const profileImg = document.createElement('img');
+                profileImg.src = imageUrl;
+                profileImg.alt = 'Profile';
+                profileImg.style.maxWidth = '150px';
+                profileImg.style.maxHeight = '150px';
+                profileImg.style.borderRadius = '8px';
+                profileImg.style.marginTop = '0.5rem';
+                profileImg.style.display = 'block';
+                bubble.appendChild(profileImg);
+            }
+
+            msgDiv.appendChild(bubble);
+
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Load chat history
+        async function loadChatHistory() {
+            try {
+                const response = await fetch('/api/chat/history');
+                const data = await response.json();
+
+                if (data.history && data.history.length > 0) {
+                    chatMessages.innerHTML = '';
+                    data.history.reverse().slice(-5).forEach(chat => {
+                        addWidgetMessage(chat.message, true);
+                        addWidgetMessage(chat.response, false);
+                    });
+                }
+            } catch (error) {
+                console.log('Could not load history:', error);
+            }
+        }
+
+        // Send message
+        async function sendWidgetMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addWidgetMessage(message, true);
+            chatInput.value = '';
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-msg bot-msg';
+            typingDiv.id = 'typing';
+
+            const avatar = document.createElement('img');
+            avatar.src = "{{ url_for('static', filename='images/chatbot_avatar.png') }}";
+            avatar.className = 'msg-avatar';
+            typingDiv.appendChild(avatar);
+
+            const typingBubble = document.createElement('div');
+            typingBubble.className = 'typing-indicator';
+            typingBubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            typingDiv.appendChild(typingBubble);
+
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                const typing = document.getElementById('typing');
+                if (typing) typing.remove();
+
+                // Add message with image URL if available
+                addWidgetMessage(data.response, false, data.image_url || null);
+
+                if (!isOpen) {
+                    messageCount++;
+                    chatBadge.textContent = messageCount;
+                    chatBadge.style.display = 'flex';
+                }
+            } catch (error) {
+                const typing = document.getElementById('typing');
+                if (typing) typing.remove();
+                addWidgetMessage('Sorry, I encountered an error. Please try again.', false);
+            }
+        }
+
+        chatSend.addEventListener('click', sendWidgetMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendWidgetMessage();
+        });
+
+        // Anonymous Message Modal Functionality
+        const anonymousBtn = document.getElementById('anonymousMessageBtn');
+        const anonymousModal = document.getElementById('anonymousModal');
+        const anonymousModalClose = document.getElementById('anonymousModalClose');
+        const anonymousCancelBtn = document.getElementById('anonymousCancelBtn');
+        const anonymousSubmitBtn = document.getElementById('anonymousSubmitBtn');
+        const anonymousMessage = document.getElementById('anonymousMessage');
+        const anonymousCategory = document.getElementById('anonymousCategory');
+        const charCount = document.getElementById('charCount');
+
+        // Open modal
+        if (anonymousBtn) {
+            anonymousBtn.addEventListener('click', () => {
+                anonymousModal.style.display = 'flex';
+                anonymousMessage.value = '';
+                anonymousCategory.value = 'complaint';
+                charCount.textContent = '0';
+            });
+        }
+
+        // Close modal
+        function closeAnonymousModal() {
+            anonymousModal.style.display = 'none';
+        }
+
+        if (anonymousModalClose) {
+            anonymousModalClose.addEventListener('click', closeAnonymousModal);
+        }
+
+        if (anonymousCancelBtn) {
+            anonymousCancelBtn.addEventListener('click', closeAnonymousModal);
+        }
+
+        // Close modal when clicking outside
+        anonymousModal.addEventListener('click', (e) => {
+            if (e.target === anonymousModal) {
+                closeAnonymousModal();
+            }
+        });
+
+        // Character counter
+        if (anonymousMessage) {
+            anonymousMessage.addEventListener('input', () => {
+                const count = anonymousMessage.value.length;
+                charCount.textContent = count;
+
+                // Change color based on length
+                if (count < 10) {
+                    charCount.style.color = '#dc3545';
+                } else if (count > 1900) {
+                    charCount.style.color = '#ffc107';
+                } else {
+                    charCount.style.color = '#666';
+                }
+            });
+        }
+
+        // Submit anonymous message
+        if (anonymousSubmitBtn) {
+            anonymousSubmitBtn.addEventListener('click', async () => {
+                const message = anonymousMessage.value.trim();
+                const category = anonymousCategory.value;
+
+                // Validate
+                if (message.length < 10) {
+                    showNotification('Please enter at least 10 characters', 'error');
+                    return;
+                }
+
+                if (message.length > 2000) {
+                    showNotification('Message is too long (max 2000 characters)', 'error');
+                    return;
+                }
+
+                // Disable button during submission
+                anonymousSubmitBtn.disabled = true;
+                anonymousSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+                try {
+                    const response = await fetch('/api/anonymous/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message,
+                            category: category
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        closeAnonymousModal();
+
+                        // Also show in chat if open
+                        if (isOpen) {
+                            addWidgetMessage('✅ Your anonymous message has been submitted successfully!', false);
+                        }
+                    } else {
+                        showNotification(data.message || 'Failed to submit message', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error submitting anonymous message:', error);
+                    showNotification('An error occurred. Please try again.', 'error');
+                } finally {
+                    // Re-enable button
+                    anonymousSubmitBtn.disabled = false;
+                    anonymousSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Anonymously';
+                }
+            });
+        }
+
+        // Notification helper function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10001;
+                font-size: 0.9rem;
+                max-width: 300px;
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Add animation styles for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Image upload functionality
+        const chatImageBtn = document.getElementById('chatWidgetImage');
+        const chatImageInput = document.getElementById('chatWidgetImageInput');
+
+        if (chatImageBtn && chatImageInput) {
+            // Click image button to trigger file input
+            chatImageBtn.addEventListener('click', () => {
+                chatImageInput.click();
+            });
+
+            // Handle image selection
+            chatImageInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    addWidgetMessage('❌ Please select a valid image file.', false);
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    addWidgetMessage('❌ Image size must be less than 5MB.', false);
+                    return;
+                }
+
+                // Show image preview in chat
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'chat-msg user-msg';
+
+                    const bubble = document.createElement('div');
+                    bubble.className = 'msg-bubble user-bubble';
+                    bubble.innerHTML = `
+                        📷 Uploaded image for recognition
+                        <img src="${event.target.result}" alt="Uploaded image">
+                    `;
+                    msgDiv.appendChild(bubble);
+
+                    chatMessages.appendChild(msgDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                };
+                reader.readAsDataURL(file);
+
+                // Show typing indicator
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'chat-msg bot-msg';
+                typingDiv.id = 'typing-image';
+
+                const avatar = document.createElement('img');
+                avatar.src = "{{ url_for('static', filename='images/chatbot_avatar.png') }}";
+                avatar.className = 'msg-avatar';
+                typingDiv.appendChild(avatar);
+
+                const typingBubble = document.createElement('div');
+                typingBubble.className = 'typing-indicator';
+                typingBubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+                typingDiv.appendChild(typingBubble);
+
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Send image to recognition API
+                try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    const response = await fetch('/api/chat/recognize-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    // Remove typing indicator
+                    const typing = document.getElementById('typing-image');
+                    if (typing) typing.remove();
+
+                    // Display result
+                    if (data.recognized && data.user) {
+                        // Person recognized - show detailed info
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'chat-msg bot-msg';
+
+                        const avatar = document.createElement('img');
+                        avatar.src = "{{ url_for('static', filename='images/chatbot_avatar.png') }}";
+                        avatar.className = 'msg-avatar';
+                        msgDiv.appendChild(avatar);
+
+                        const bubble = document.createElement('div');
+                        bubble.className = 'msg-bubble bot-bubble';
+                        bubble.innerHTML = `
+                            <strong>${data.message}</strong>
+                            <div class="user-info-card">
+                                <div class="info-row">
+                                    <span class="info-label">Name:</span>
+                                    <span class="info-value">${data.user.full_name}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Role:</span>
+                                    <span class="info-value">${data.user.role}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value">${data.user.email}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Department:</span>
+                                    <span class="info-value">${data.user.department}</span>
+                                </div>
+                                ${data.user.program !== 'N/A' ? `
+                                <div class="info-row">
+                                    <span class="info-label">Program:</span>
+                                    <span class="info-value">${data.user.program}</span>
+                                </div>
+                                ` : ''}
+                                <div class="info-row">
+                                    <span class="info-label">Availability:</span>
+                                    <span class="info-value">${data.user.availability}</span>
+                                </div>
+                            </div>
+                        `;
+                        msgDiv.appendChild(bubble);
+
+                        chatMessages.appendChild(msgDiv);
+                    } else {
+                        // Not recognized
+                        addWidgetMessage(data.message, false);
+                    }
+
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                } catch (error) {
+                    console.error('Error recognizing image:', error);
+                    const typing = document.getElementById('typing-image');
+                    if (typing) typing.remove();
+                    addWidgetMessage('❌ Error processing image. Please try again.', false);
+                }
+
+                // Reset file input
+                chatImageInput.value = '';
+            });
+        }
+    })();
+</script>

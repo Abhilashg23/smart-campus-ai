@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Visitor History - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem; max-width: 1800px;">
+    <!-- Modern Header -->
+    <div class="page-header" style="margin-bottom: 2.5rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                <a href="{{ url_for('visitor_entry.dashboard') if current_user.role == 'VisitorEntry' else url_for('security.admin_dashboard') }}"
+                    style="width: 45px; height: 45px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #475569; transition: all 0.3s;">
+                    <i class="fas fa-arrow-left" style="font-size: 1.2rem;"></i>
+                </a>
+                <h1
+                    style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 1rem;">
+                    <div
+                        style="width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);">
+                        <i class="fas fa-history" style="color: white; font-size: 1.8rem;"></i>
+                    </div>
+                    Visitor History
+                </h1>
+            </div>
+            <p style="color: #64748b; font-size: 1.1rem; margin: 0 0 0 60px;">Complete visitor records for the last {{
+                days }} days</p>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="modern-card" style="margin-bottom: 2rem;">
+        <div class="card-header"
+            style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 1.5rem 2rem; border-bottom: 2px solid #e2e8f0;">
+            <h3
+                style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-filter" style="color: #3b82f6;"></i>
+                Filter Visitors
+            </h3>
+        </div>
+        <div style="padding: 2rem;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1.5rem; align-items: end;">
+                <div>
+                    <label
+                        style="display: block; font-weight: 600; color: #475569; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <i class="fas fa-search" style="margin-right: 0.5rem; color: #94a3b8;"></i>
+                        Search by Name
+                    </label>
+                    <input type="text" id="searchInput" class="modern-input" placeholder="Enter visitor name...">
+                </div>
+                <div>
+                    <label
+                        style="display: block; font-weight: 600; color: #475569; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <i class="fas fa-toggle-on" style="margin-right: 0.5rem; color: #94a3b8;"></i>
+                        Status
+                    </label>
+                    <select id="statusFilter" class="modern-select">
+                        <option value="">All</option>
+                        <option value="IN">Checked In</option>
+                        <option value="OUT">Checked Out</option>
+                    </select>
+                </div>
+                <div>
+                    <label
+                        style="display: block; font-weight: 600; color: #475569; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <i class="fas fa-user-tag" style="margin-right: 0.5rem; color: #94a3b8;"></i>
+                        Visitor Type
+                    </label>
+                    <select id="typeFilter" class="modern-select">
+                        <option value="">All</option>
+                        <option value="new">New Visitors</option>
+                        <option value="returning">Returning</option>
+                    </select>
+                </div>
+                <button class="modern-btn btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-filter"></i> Apply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visitors Table Card -->
+    <div class="modern-card">
+        <div class="card-header"
+            style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 1.5rem 2rem; border-bottom: 2px solid #e2e8f0;">
+            <h3
+                style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-list" style="color: #3b82f6;"></i>
+                All Visitors
+                <span class="badge"
+                    style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem;"
+                    id="visitorCount">{{ visitors|length }}</span>
+            </h3>
+        </div>
+        <div style="padding: 0;">
+            {% if visitors %}
+            <div class="table-responsive">
+                <table class="modern-table" id="visitorsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Photo</th>
+                            <th>Name</th>
+                            <th>Reason</th>
+                            <th>Organization</th>
+                            <th>Entry Time</th>
+                            <th>Exit Time</th>
+                            <th style="width: 100px;">Duration</th>
+                            <th style="width: 140px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitors %}
+                        <tr data-status="{{ visitor.status }}"
+                            data-type="{{ 'returning' if visitor.is_returning_visitor else 'new' }}">
+                            <td>
+                                <img src="{{ url_for('visitor_api.get_photo', visitor_id=visitor.id) }}"
+                                    alt="{{ visitor.name }}" class="table-photo"
+                                    onclick="showVisitorDetails({{ visitor.id }})">
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <strong style="color: #1e293b; font-size: 1rem;">{{ visitor.name }}</strong>
+                                    {% if visitor.is_returning_visitor %}
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-star"></i> Visit #{{ visitor.previous_visit_count + 1 }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="color: #475569;">{{ visitor.reason }}</td>
+                            <td style="color: #64748b;">{{ visitor.organization or '-' }}</td>
+                            <td style="color: #475569; font-weight: 500;">
+                                <i class="fas fa-sign-in-alt" style="color: #10b981; margin-right: 0.5rem;"></i>
+                                {{ visitor.entry_time.strftime('%b %d, %I:%M %p') }}
+                            </td>
+                            <td style="color: #475569; font-weight: 500;">
+                                {% if visitor.exit_time %}
+                                <i class="fas fa-sign-out-alt" style="color: #ef4444; margin-right: 0.5rem;"></i>
+                                {{ visitor.exit_time.strftime('%b %d, %I:%M %p') }}
+                                {% else %}
+                                <span style="color: #94a3b8;">-</span>
+                                {% endif %}
+                            </td>
+                            <td style="color: #64748b; font-weight: 500;">
+                                {% if visitor.exit_time %}
+                                {% set duration = (visitor.exit_time - visitor.entry_time).total_seconds() / 3600 %}
+                                <i class="fas fa-clock" style="color: #3b82f6; margin-right: 0.5rem;"></i>
+                                {{ "%.1f"|format(duration) }} hrs
+                                {% else %}
+                                <span style="color: #94a3b8;">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if visitor.status == 'IN' %}
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-check-circle"></i> Checked In
+                                </span>
+                                {% else %}
+                                <span class="status-badge status-completed">
+                                    <i class="fas fa-sign-out-alt"></i> Checked Out
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding: 4rem 2rem; text-align: center;">
+                <i class="fas fa-inbox" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem;"></i>
+                <h3 style="color: #64748b; font-size: 1.3rem; margin: 0 0 0.5rem 0;">No visitor records found</h3>
+                <p style="color: #94a3b8; margin: 0;">Try adjusting your filters or check back later</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .modern-card:hover {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .modern-input,
+    .modern-select {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s;
+        font-family: inherit;
+        background: white;
+    }
+
+    .modern-input:focus,
+    .modern-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .modern-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .modern-btn {
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .modern-table thead {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+
+    .modern-table th {
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .modern-table td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+    }
+
+    .modern-table tbody tr {
+        transition: all 0.3s;
+    }
+
+    .modern-table tbody tr:hover {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        transform: scale(1.01);
+    }
+
+    .table-photo {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-photo:hover {
+        transform: scale(1.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+        color: #374151;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .page-header a:hover {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        transform: translateX(-3px);
+    }
+</style>
+
+<script>
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const typeFilter = document.getElementById('typeFilter').value;
+
+        const rows = document.querySelectorAll('#visitorsTable tbody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const status = row.dataset.status;
+            const type = row.dataset.type;
+
+            let showRow = true;
+
+            // Search filter
+            if (searchTerm && !name.includes(searchTerm)) {
+                showRow = false;
+            }
+
+            // Status filter
+            if (statusFilter && status !== statusFilter) {
+                showRow = false;
+            }
+
+            // Type filter
+            if (typeFilter && type !== typeFilter) {
+                showRow = false;
+            }
+
+            row.style.display = showRow ? '' : 'none';
+            if (showRow) visibleCount++;
+        });
+
+        // Update count
+        document.getElementById('visitorCount').textContent = visibleCount;
+    }
+
+    // Real-time search
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('statusFilter').addEventListener('change', applyFilters);
+    document.getElementById('typeFilter').addEventListener('change', applyFilters);
+
+    function showVisitorDetails(visitorId) {
+        // Could implement a modal with detailed visitor information
+        console.log('Show details for visitor:', visitorId);
+    }
+</script>
+{% endblock %}

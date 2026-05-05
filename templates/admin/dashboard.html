@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background -->
+<section
+    style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.95) 0%, rgba(59, 130, 246, 0.9) 50%, rgba(139, 92, 246, 0.95) 100%), url('{{ url_for('static', filename='images/admin_bg.png') }}'); background-size: cover; background-position: center; padding: 3rem 0; position: relative; overflow: hidden;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; padding: 0 2rem;">
+        <div style="text-align: center; color: white; margin-bottom: 2.5rem;" class="fade-in-up">
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em;">
+                Admin Dashboard
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.9; font-weight: 300;">
+                Complete system overview and management center
+            </p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-3" style="gap: 1.5rem;">
+            <div class="stat-card-modern fade-in-up"
+                style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)); padding: 1.75rem; border-radius: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+
+                <div
+                    style="font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    {{ total_users }}</div>
+                <div
+                    style="color: #64748b; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Total Users</div>
+            </div>
+
+            <div class="stat-card-modern fade-in-up"
+                style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)); padding: 1.75rem; border-radius: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transition-delay: 0.1s; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+
+                <div
+                    style="font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; background: linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    {{ total_events }}</div>
+                <div
+                    style="color: #64748b; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Total Events</div>
+            </div>
+
+            <div class="stat-card-modern fade-in-up"
+                style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)); padding: 1.75rem; border-radius: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transition-delay: 0.2s; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+
+                <div
+                    style="font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    {{ pending_registrations }}</div>
+                <div
+                    style="color: #64748b; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Pending Approvals</div>
+            </div>
+
+            <div class="stat-card-modern fade-in-up"
+                style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)); padding: 1.75rem; border-radius: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transition-delay: 0.3s; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+
+                <div
+                    style="font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    {{ total_departments }}</div>
+                <div
+                    style="color: #64748b; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Departments</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions Section -->
+<section style="padding: 3rem 0; background: linear-gradient(to bottom, #ffffff, #f8fafc);">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <div style="text-align: center; margin-bottom: 2.5rem;" class="fade-in-up">
+            <h2
+                style="font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; letter-spacing: -0.01em;">
+                Quick Actions
+            </h2>
+            <p style="font-size: 1rem; color: #64748b; font-weight: 400;">
+                Manage your campus efficiently with these powerful shortcuts
+            </p>
+        </div>
+
+        <div class="grid grid-3" style="gap: 1.25rem;">
+            <a href="{{ url_for('admin.create_event') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0s;">
+                <div
+                    style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(59,130,246,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Create
+                        Event</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.add_user') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.1s;">
+                <div
+                    style="background: linear-gradient(135deg, #10b981, #3b82f6); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(16,185,129,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Add
+                        User
+                    </h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('common.face_recognition') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.2s;">
+                <div
+                    style="background: linear-gradient(135deg, #06b6d4, #3b82f6); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(6,182,212,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Take
+                        Attendance</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.users') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.3s;">
+                <div
+                    style="background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(139,92,246,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Manage
+                        Users</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.manage_faculty') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.35s;">
+                <div
+                    style="background: linear-gradient(135deg, #10b981, #059669); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(16,185,129,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Manage
+                        Faculty</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.departments') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.4s;">
+                <div
+                    style="background: linear-gradient(135deg, #f59e0b, #ef4444); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(245,158,11,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Manage
+                        Departments</h3>
+                </div>
+            </a>
+            
+            <a href="{{ url_for('admin.pending_registrations') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.45s;">
+                <div
+                    style="background: linear-gradient(135deg, #f97316, #ea580c); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(249,115,22,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">Pending
+                        Approvals</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.events') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.5s;">
+                <div
+                    style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(99,102,241,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">View
+                        All
+                        Events</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.classes') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.6s;">
+                <div
+                    style="background: linear-gradient(135deg, #14b8a6, #06b6d4); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(20,184,166,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">View
+                        Classes</h3>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin.anonymous_messages') }}" class="action-card fade-in-up"
+                style="text-decoration: none; transition-delay: 0.65s;">
+                <div
+                    style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 1.5rem 1.25rem; border-radius: 12px; text-align: center; color: white; transition: all 0.3s; box-shadow: 0 4px 16px rgba(245,158,11,0.25); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;">
+                    </div>
+
+                    <h3 style="font-size: 1.05rem; font-weight: 600; margin: 0; position: relative; z-index: 1;">
+                        Anonymous
+                        Messages</h3>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+</div>
+</section>
+
+<!-- Recent Events Section -->
+{% if recent_events %}
+<section style="padding: 4rem 0; background: linear-gradient(to bottom, #f8fafc, #ffffff);">
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                Recent Events
+            </h2>
+            <p style="font-size: 1.1rem; color: #64748b;">
+                Latest campus activities and events
+            </p>
+        </div>
+
+        <div class="card fade-in-up"
+            style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white;">
+                            <th style="padding: 1.5rem; text-align: left; font-weight: 600;">Title</th>
+                            <th style="padding: 1.5rem; text-align: left; font-weight: 600;">Date</th>
+                            <th style="padding: 1.5rem; text-align: left; font-weight: 600;">Location</th>
+                            <th style="padding: 1.5rem; text-align: left; font-weight: 600;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in recent_events %}
+                        <tr style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                            <td style="padding: 1.5rem; color: #1e293b; font-weight: 500;">{{ event.title }}</td>
+                            <td style="padding: 1.5rem; color: #64748b;">{{ event.event_date|datetime('%B %d, %Y at
+                                %I:%M %p') }}</td>
+                            <td style="padding: 1.5rem; color: #64748b;">{{ event.location }}</td>
+                            <td style="padding: 1.5rem;">
+                                <a href="{{ url_for('admin.edit_event', event_id=event.id) }}" class="btn"
+                                    style="padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 0.9rem;">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+    /* Scroll Animations */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Stat Card Hover */
+    .stat-card-modern {
+        transition: all 0.3s ease;
+    }
+
+    .stat-card-modern:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Action Card Hover */
+    .action-card div {
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover div {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Table Row Hover */
+    tbody tr:hover {
+        background: #f8fafc !important;
+    }
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    @media (max-width: 768px) {
+
+        .grid-3,
+        .grid-4 {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in-up').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+</script>
+{% endblock %}

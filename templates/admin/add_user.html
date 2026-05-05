@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}Add User - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Add User Background -->
+<section
+    style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(99, 102, 241, 0.9) 50%, rgba(139, 92, 246, 0.95) 100%), url('{{ url_for('static', filename='images/add_user_bg.png') }}'); background-size: cover; background-position: center; padding: 2.5rem 0; position: relative; overflow: hidden; animation: bgWave 22s ease-in-out infinite;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+            <div>
+                <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    Add New User
+                </h1>
+                <p style="font-size: 1rem; opacity: 0.9;">
+                    Create new user accounts for the system
+                </p>
+            </div>
+            <a href="{{ url_for('admin.dashboard') }}"
+                style="padding: 0.75rem 1.5rem; background: white; color: #3b82f6; border-radius: 10px; text-decoration: none; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: all 0.3s;">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Form Section -->
+<section style="padding: 2rem 0; background: linear-gradient(to bottom, #f8fafc, #ffffff); color: #1e293b;">
+    <div class="container" style="margin-top: 0;">
+
+        <!-- Add User Form -->
+        <div class="card">
+            <div class="card-header">User Information</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_user') }}" id="addUserForm"
+                    enctype="multipart/form-data">
+                    <div class="grid grid-2" style="gap: 1.5rem;">
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Username <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <input type="text" id="username" name="username" class="form-control" required
+                                pattern="[a-zA-Z0-9_]{3,20}"
+                                title="3-20 characters, letters, numbers, and underscores only"
+                                placeholder="e.g., john_doe">
+                            <small style="color: var(--text-secondary); font-size: 0.85rem;">3-20 characters, letters,
+                                numbers, and underscores only</small>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Email <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="form-control" required
+                                placeholder="e.g., john.doe@example.com">
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="form-group">
+                            <label for="full_name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Full Name <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <input type="text" id="full_name" name="full_name" class="form-control" required
+                                placeholder="e.g., John Doe">
+                        </div>
+
+                        <!-- Role -->
+                        <div class="form-group">
+                            <label for="role" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Role <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <select id="role" name="role" class="form-control" required>
+                                <option value="">-- Select Role --</option>
+                                <option value="Student">Student</option>
+                                <option value="Faculty">Faculty</option>
+                            </select>
+                        </div>
+
+                        <!-- Department -->
+                        <div class="form-group">
+                            <label for="department_id" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Department <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <select id="department_id" name="department_id" class="form-control" required>
+                                <option value="">-- Select Department --</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Student-Specific Fields (shown only for students) -->
+                    <div id="studentFields" style="display: none;">
+                        <div
+                            style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1.5rem; margin: 1.5rem 0; border-radius: 8px;">
+                            <h4 style="margin: 0 0 1rem 0; color: #1e40af; font-size: 1.1rem;">
+                                Student Information
+                            </h4>
+
+                            <div class="grid grid-2" style="gap: 1.5rem;">
+                                <!-- First Name -->
+                                <div class="form-group">
+                                    <label for="first_name"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        First Name <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <input type="text" id="first_name" name="first_name" class="form-control"
+                                        placeholder="e.g., John">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="form-group">
+                                    <label for="last_name"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Last Name <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <input type="text" id="last_name" name="last_name" class="form-control"
+                                        placeholder="e.g., Doe">
+                                </div>
+
+                                <!-- Registration ID -->
+                                <div class="form-group">
+                                    <label for="registration_id"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Registration ID <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <input type="text" id="registration_id" name="registration_id" class="form-control"
+                                        placeholder="e.g., 18341A1234">
+                                    <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                                        Student's unique registration/roll number
+                                    </small>
+                                </div>
+
+
+                                <!-- Program -->
+                                <div class="form-group">
+                                    <label for="program_id"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Program <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <select id="program_id" name="program_id" class="form-control"
+                                        onchange="toggleCustomProgram()">
+                                        <option value="">-- Select Program --</option>
+                                        {% for program in programs %}
+                                        <option value="{{ program.id }}">{{ program.name }}</option>
+                                        {% endfor %}
+                                        <option value="other">Other (Enter Custom Program)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Custom Program Entry (hidden by default) -->
+                                <div class="form-group" id="customProgramField" style="display: none;">
+                                    <label for="custom_program"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Enter Program Name <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <input type="text" id="custom_program" name="custom_program" class="form-control"
+                                        placeholder="e.g., BCA Artificial Intelligence">
+                                    <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                                        Enter the full program name if not found in the list above
+                                    </small>
+                                </div>
+
+                                <!-- Year -->
+                                <div class="form-group">
+                                    <label for="year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Year <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <select id="year" name="year" class="form-control">
+                                        <option value="">-- Select Year --</option>
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3">3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+
+                                <!-- Semester -->
+                                <div class="form-group">
+                                    <label for="semester"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Semester <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <select id="semester" name="semester" class="form-control">
+                                        <option value="">-- Select Semester --</option>
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                        <option value="3">Semester 3</option>
+                                        <option value="4">Semester 4</option>
+                                        <option value="5">Semester 5</option>
+                                        <option value="6">Semester 6</option>
+                                        <option value="7">Semester 7</option>
+                                        <option value="8">Semester 8</option>
+                                    </select>
+                                </div>
+
+                                <!-- Section -->
+                                <div class="form-group">
+                                    <label for="section"
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                        Section <span style="color: var(--danger-color);">*</span>
+                                    </label>
+                                    <select id="section" name="section" class="form-control">
+                                        <option value="">-- Select Section --</option>
+                                        <option value="A">Section A</option>
+                                        <option value="B">Section B</option>
+                                        <option value="C">Section C</option>
+                                        <option value="D">Section D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2" style="gap: 1.5rem;">
+
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Password <span style="color: var(--danger-color);">*</span>
+                            </label>
+                            <input type="password" id="password" name="password" class="form-control" required
+                                minlength="8"
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
+                                title="At least 8 characters with uppercase, lowercase, number, and special character"
+                                placeholder="Enter password">
+                            <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                                Min 8 characters with uppercase, lowercase, number, and special character
+                            </small>
+                            <!-- Password strength indicator -->
+                            <div id="passwordStrength"
+                                style="margin-top: 0.5rem; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                                <div id="passwordStrengthBar"
+                                    style="height: 100%; width: 0%; transition: all 0.3s ease;">
+                                </div>
+                            </div>
+                            <small id="passwordStrengthText" style="font-size: 0.85rem;"></small>
+                        </div>
+
+                        <!-- Profile Picture for Face Recognition -->
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="profile_picture"
+                                style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                                Profile Picture for Attendance
+                                <span style="color: #ef4444; font-size: 0.9rem;">(Required for Students)</span>
+                            </label>
+                            <div
+                                style="background: #eff6ff; border: 2px dashed #3b82f6; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                                <div style="display: flex; align-items: start; gap: 1rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.5rem; margin-top: 0.25rem;"></i>
+                                    <div>
+                                        <h4 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 1rem;">Face
+                                            Recognition Requirements</h4>
+                                        <ul
+                                            style="margin: 0; padding-left: 1.25rem; color: #1e40af; font-size: 0.9rem; line-height: 1.6;">
+                                            <li>Upload a clear, front-facing photo of the student</li>
+                                            <li>Photo must contain exactly ONE face</li>
+                                            <li>Good lighting and clear facial features required</li>
+                                            <li>This photo will be used for automatic attendance</li>
+                                            <li>Passport-style photos work best</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <input type="file" id="profile_picture" name="profile_picture" class="form-control"
+                                    accept="image/jpeg,image/jpg,image/png" onchange="previewImage(event)"
+                                    style="margin-bottom: 0.5rem;">
+                                <small style="color: #64748b; font-size: 0.85rem;">
+                                    Accepted formats: JPG,
+                                    PNG (Max 5MB)
+                                </small>
+                            </div>
+                            <!-- Image Preview -->
+                            <div id="imagePreview" style="display: none;">
+                                <img id="preview" src="" alt="Profile Preview"
+                                    style="max-width: 200px; max-height: 200px; border-radius: var(--radius-md); border: 2px solid var(--border-color);">
+                                <button type="button" onclick="removeImage()" class="btn btn-secondary"
+                                    style="display: block; margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.9rem;">Remove
+                                    Image</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            Add User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card"
+            style="margin-top: 2rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));">
+            <div class="card-body">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">ℹ Important Notes</h4>
+                <ul style="color: var(--text-secondary); line-height: 1.8;">
+                    <li>Users created through this form will be <strong>immediately active</strong> and approved</li>
+                    <li>The user will be able to login right away with the provided credentials</li>
+                    <li>Make sure to communicate the login credentials securely to the user</li>
+                    <li>Username and email must be unique across the system</li>
+                    <li>Students and Faculty must be assigned to a department</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Password strength checker
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+
+            passwordInput.addEventListener('input', function () {
+                const password = this.value;
+                let strength = 0;
+
+                // Check length
+                if (password.length >= 8) strength += 25;
+                if (password.length >= 12) strength += 25;
+
+                // Check for lowercase
+                if (/[a-z]/.test(password)) strength += 12.5;
+
+                // Check for uppercase
+                if (/[A-Z]/.test(password)) strength += 12.5;
+
+                // Check for numbers
+                if (/\d/.test(password)) strength += 12.5;
+
+                // Check for special characters
+                if (/[@$!%*?&]/.test(password)) strength += 12.5;
+
+                // Update bar
+                strengthBar.style.width = strength + '%';
+
+                // Update color and text
+                if (strength < 40) {
+                    strengthBar.style.background = 'var(--danger-color)';
+                    strengthText.textContent = ' Weak password';
+                    strengthText.style.color = 'var(--danger-color)';
+                } else if (strength < 70) {
+                    strengthBar.style.background = 'var(--warning-color)';
+                    strengthText.textContent = ' Medium password';
+                    strengthText.style.color = 'var(--warning-color)';
+                } else {
+                    strengthBar.style.background = 'var(--success-color)';
+                    strengthText.textContent = ' Strong password';
+                    strengthText.style.color = 'var(--success-color)';
+                }
+            });
+
+            // Image preview function
+            window.previewImage = function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Check file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById('preview').src = e.target.result;
+                        document.getElementById('imagePreview').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            // Remove image function
+            window.removeImage = function () {
+                document.getElementById('profile_picture').value = '';
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('preview').src = '';
+            };
+
+            // Toggle custom program field
+            window.toggleCustomProgram = function () {
+                const programSelect = document.getElementById('program_id');
+                const customProgramField = document.getElementById('customProgramField');
+                const customProgramInput = document.getElementById('custom_program');
+
+                if (programSelect.value === 'other') {
+                    customProgramField.style.display = 'block';
+                    customProgramInput.required = true;
+                } else {
+                    customProgramField.style.display = 'none';
+                    customProgramInput.required = false;
+                    customProgramInput.value = '';
+                }
+            };
+
+            // Toggle student fields based on role selection
+            const roleSelect = document.getElementById('role');
+            const studentFields = document.getElementById('studentFields');
+            const studentInputs = studentFields.querySelectorAll('input, select');
+
+            roleSelect.addEventListener('change', function () {
+                if (this.value === 'Student') {
+                    studentFields.style.display = 'block';
+                    // Make student fields required
+                    studentInputs.forEach(input => {
+                        if (input.id !== 'profile_picture') {
+                            input.required = true;
+                        }
+                    });
+                } else {
+                    studentFields.style.display = 'none';
+                    // Remove required from student fields
+                    studentInputs.forEach(input => {
+                        input.required = false;
+                        input.value = ''; // Clear values
+                    });
+                }
+            });
+
+            // Form validation
+            document.getElementById('addUserForm').addEventListener('submit', function (e) {
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating User...';
+            });
+        });
+    </script>
+</section>
+
+<style>
+    @keyframes bgWave {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    .card {
+        animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

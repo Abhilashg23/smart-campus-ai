@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Registrations - Admin{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Pending Background -->
+<section
+    style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(251, 146, 60, 0.9) 50%, rgba(239, 68, 68, 0.95) 100%), url('{{ url_for('static', filename='images/pending_bg.png') }}'); background-size: cover; background-position: center; padding: 3rem 0; position: relative; overflow: hidden; animation: bgZoom 18s ease-in-out infinite;">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; position: relative; z-index: 2;">
+        <div style="color: white;">
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                Pending Registrations
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.9;">
+                Review and approve new user registrations
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Pending Registrations Table Section -->
+<section style="padding: 3rem 0; background: linear-gradient(to bottom, #f8fafc, #ffffff);">
+    <div class="container" style="max-width: 1400px; margin: 0 auto;">
+        <div class="card fade-in-up"
+            style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;">
+            {% if pending_registrations or unapproved_users %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white;">
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Full Name</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Username</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Email</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Role</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Date</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in pending_registrations %}
+                        <tr style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                            <td style="padding: 1.25rem; color: #1e293b; font-weight: 500;">{{ reg.full_name }}</td>
+                            <td style="padding: 1.25rem; color: #64748b;">{{ reg.username }}</td>
+                            <td style="padding: 1.25rem; color: #64748b;">{{ reg.email }}</td>
+                            <td style="padding: 1.25rem;">
+                                <span
+                                    style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">
+                                    {{ reg.role }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem; color: #64748b;">{{ reg.created_at|datetime('%B %d, %Y') }}
+                            </td>
+                            <td style="padding: 1.25rem; display: flex; gap: 0.5rem;">
+                                <form method="POST" action="{{ url_for('admin.approve_registration', reg_id=reg.id) }}"
+                                    style="display: inline;">
+                                    <button type="submit"
+                                        style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s;">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.reject_registration', reg_id=reg.id) }}"
+                                    style="display: inline;">
+                                    <button type="submit"
+                                        style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s;">
+                                        Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for user in unapproved_users %}
+                        <tr style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                            <td style="padding: 1.25rem; color: #1e293b; font-weight: 500;">{{ user.full_name }}</td>
+                            <td style="padding: 1.25rem; color: #64748b;">{{ user.username }}</td>
+                            <td style="padding: 1.25rem; color: #64748b;">{{ user.email }}</td>
+                            <td style="padding: 1.25rem;">
+                                <span
+                                    style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem; color: #64748b;">
+                                {% if user.created_at %}{{ user.created_at|datetime('%B %d, %Y') }}{% else %}N/A{% endif
+                                %}
+                            </td>
+                            <td style="padding: 1.25rem; display: flex; gap: 0.5rem;">
+                                <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}"
+                                    style="display: inline;">
+                                    <button type="submit"
+                                        style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s;">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}"
+                                    style="display: inline;">
+                                    <button type="submit"
+                                        style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s;">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 4rem; color: #64748b;">
+
+                style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3; color: #10b981;"></i>
+                <p style="font-size: 1.2rem;">No pending registrations.</p>
+                <p style="font-size: 0.95rem; margin-top: 0.5rem;">All registrations have been processed!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    @keyframes bgZoom {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    tbody tr:hover {
+        background: #f8fafc !important;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-up').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+</script>
+{% endblock %}

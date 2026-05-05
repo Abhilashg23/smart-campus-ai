@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Submit Feedback - Student Portal{% endblock %}
+{% block content %}
+<style>
+.sfb-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 100vh; background: #f1f5f9; }
+.sfb-hero { background: linear-gradient(135deg, #7c3aed, #db2777); border-radius: 24px; padding: 2.5rem 3rem; color: white; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.sfb-hero h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 0.4rem 0; }
+.sfb-hero p  { opacity: 0.85; margin: 0 0 1.25rem 0; }
+.sfb-hero .bg-icon { position: absolute; right: -10px; bottom: -20px; font-size: 12rem; color: rgba(255,255,255,0.06); transform: rotate(-10deg); }
+.back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.15); color: white; padding: 0.6rem 1.25rem; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.25); }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+
+/* Feedback card */
+.fb-card { background: white; border-radius: 22px; border: 1px solid #e8edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+.fb-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.fb-card-top { padding: 1.5rem 1.75rem; border-bottom: 1px solid #f1f5f9; }
+.fb-card-top .code { font-size: 0.75rem; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; font-family: monospace; }
+.fb-card-top h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem 0; }
+.fb-card-top .faculty { font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.4rem; }
+.sem-badge { background: #e0e7ff; color: #4f46e5; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; }
+.fb-card-body { padding: 1.5rem 1.75rem; flex: 1; }
+
+/* Star Rating Interactive */
+.star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 0.35rem; margin-bottom: 1rem; }
+.star-rating input { display: none; }
+.star-rating label { font-size: 1.75rem; color: #e2e8f0; cursor: pointer; transition: color .15s, transform .15s; line-height: 1; }
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label { color: #f59e0b; transform: scale(1.1); }
+.star-lbl { display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8; font-weight: 600; margin-top: -0.5rem; margin-bottom: 1rem; padding: 0 0.1rem; }
+
+textarea.fb-input { width: 100%; padding: 0.85rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 0.9rem; resize: vertical; min-height: 90px; box-sizing: border-box; transition: border-color .2s; outline: none; }
+textarea.fb-input:focus { border-color: #7c3aed; }
+
+.btn-submit { width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #7c3aed, #db2777); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: opacity .2s, transform .1s; margin-top: 1rem; }
+.btn-submit:hover { opacity: 0.9; transform: scale(0.99); }
+
+/* Submitted card */
+.submitted-overlay { padding: 1.5rem 1.75rem; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #f8fafc; }
+.submitted-stars { color: #f59e0b; font-size: 1.3rem; margin-bottom: 0.5rem; }
+.check-icon { width: 56px; height: 56px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.edit-link { font-size: 0.82rem; color: #7c3aed; text-decoration: none; font-weight: 600; margin-top: 0.5rem; }
+.edit-link:hover { text-decoration: underline; }
+</style>
+
+<div class="sfb-wrap">
+    <div class="sfb-hero">
+        <div style="position:relative;z-index:2;">
+            <h1><i class="fas fa-star" style="margin-right:8px;"></i>Course Feedback</h1>
+            <p>Rate your faculty and share your learning experience. Your feedback is anonymous.</p>
+            <a href="{{ url_for('student.dashboard') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+        <i class="fas fa-comment-dots bg-icon"></i>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for cat, msg in messages %}
+    <div style="padding:1rem 1.25rem;border-radius:14px;margin-bottom:1.5rem;
+        {% if cat == 'success' %}background:#dcfce7;color:#166534;border:1px solid #bbf7d0;
+        {% elif cat == 'danger' %}background:#fee2e2;color:#991b1b;border:1px solid #fecaca;
+        {% else %}background:#fef3c7;color:#92400e;border:1px solid #fde68a;{% endif %}">
+        <i class="fas fa-{% if cat == 'success' %}check-circle{% elif cat == 'danger' %}exclamation-circle{% else %}exclamation-triangle{% endif %}" style="margin-right:6px;"></i>{{ msg }}
+    </div>
+    {% endfor %}{% endif %}
+    {% endwith %}
+
+    {% if subjects_feedback %}
+    <p style="color:#475569;font-weight:600;margin-bottom:1.25rem;">
+        {{ subjects_feedback|length }} subject{{ 's' if subjects_feedback|length != 1 }} &mdash;
+        <span style="color:#16a34a;">{{ subjects_feedback|selectattr('submitted')|list|length }} submitted</span> &bull;
+        <span style="color:#7c3aed;">{{ subjects_feedback|rejectattr('submitted')|list|length }} pending</span>
+    </p>
+
+    <div class="cards-grid">
+        {% for item in subjects_feedback %}
+        <div class="fb-card">
+            <div class="fb-card-top">
+                <div class="code">{{ item.subject.code }}</div>
+                <h3>{{ item.subject.name }}</h3>
+                <div class="faculty">
+                    <i class="fas fa-chalkboard-teacher" style="color:#7c3aed;"></i>
+                    {{ item.subject.faculty.full_name if item.subject.faculty else 'Faculty TBA' }}
+                    <span class="sem-badge" style="margin-left:auto;">Sem {{ item.subject.semester }}</span>
+                </div>
+            </div>
+
+            {% if item.submitted %}
+            <!-- Submitted state -->
+            <div class="submitted-overlay">
+                <div class="check-icon"><i class="fas fa-check" style="color:#16a34a;font-size:1.5rem;"></i></div>
+                <div class="submitted-stars">
+                    {% for i in range(1, 6) %}
+                    <i class="fas fa-star" style="color:{% if i <= item.existing.rating %}#f59e0b{% else %}#e2e8f0{% endif %};"></i>
+                    {% endfor %}
+                </div>
+                <p style="font-weight:700;color:#166534;margin:0 0 0.25rem 0;">Feedback Submitted</p>
+                <p style="font-size:0.82rem;color:#64748b;margin:0;">You rated this {{ item.existing.rating }}/5</p>
+                {% if item.existing.comments %}
+                <p style="font-size:0.8rem;color:#475569;margin:0.75rem 0 0;padding:0.65rem;background:white;border-radius:10px;border:1px solid #e2e8f0;text-align:left;width:100%;">
+                    "{{ item.existing.comments }}"
+                </p>
+                {% endif %}
+                <!-- Allow editing -->
+                <details style="width:100%;margin-top:1rem;">
+                    <summary class="edit-link"><i class="fas fa-edit" style="margin-right:4px;"></i>Update feedback</summary>
+                    <form method="POST" action="{{ url_for('student.feedback') }}" style="margin-top:1rem;text-align:left;">
+                        <input type="hidden" name="subject_id" value="{{ item.subject.id }}">
+                        <div class="star-rating">
+                            {% for i in [5, 4, 3, 2, 1] %}
+                            <input type="radio" id="star_edit_{{ item.subject.id }}_{{ i }}" name="rating" value="{{ i }}" {% if item.existing.rating == i %}checked{% endif %}>
+                            <label for="star_edit_{{ item.subject.id }}_{{ i }}">★</label>
+                            {% endfor %}
+                        </div>
+                        <div class="star-lbl"><span>Poor</span><span>Excellent</span></div>
+                        <textarea class="fb-input" name="comments" rows="2" placeholder="Update your comment...">{{ item.existing.comments or '' }}</textarea>
+                        <button type="submit" class="btn-submit">Update Feedback</button>
+                    </form>
+                </details>
+            </div>
+
+            {% else %}
+            <!-- Submit form -->
+            <div class="fb-card-body">
+                <form method="POST" action="{{ url_for('student.feedback') }}">
+                    <input type="hidden" name="subject_id" value="{{ item.subject.id }}">
+                    <label style="font-size:0.85rem;font-weight:700;color:#374151;display:block;margin-bottom:0.6rem;">Your Rating <span style="color:#ef4444;">*</span></label>
+                    <div class="star-rating">
+                        {% for i in [5, 4, 3, 2, 1] %}
+                        <input type="radio" id="star_{{ item.subject.id }}_{{ i }}" name="rating" value="{{ i }}" required>
+                        <label for="star_{{ item.subject.id }}_{{ i }}">★</label>
+                        {% endfor %}
+                    </div>
+                    <div class="star-lbl"><span>Poor</span><span>Average</span><span>Excellent</span></div>
+                    <label style="font-size:0.85rem;font-weight:700;color:#374151;display:block;margin-bottom:0.5rem;">Comments <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+                    <textarea class="fb-input" name="comments" rows="3" placeholder="What did you like? What could be improved?"></textarea>
+                    <button type="submit" class="btn-submit"><i class="fas fa-paper-plane" style="margin-right:6px;"></i>Submit Feedback</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="background:white;border-radius:20px;padding:4rem;text-align:center;border:1px dashed #cbd5e1;">
+        <i class="fas fa-inbox" style="font-size:3rem;color:#cbd5e1;display:block;margin-bottom:1rem;"></i>
+        <h3 style="color:#475569;margin:0 0 0.5rem 0;">No Subjects Found</h3>
+        <p style="color:#64748b;margin:0;">You are not currently enrolled in any subjects. Please contact your admin.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

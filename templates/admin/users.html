@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background -->
+<section
+    style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.95) 0%, rgba(59, 130, 246, 0.9) 50%, rgba(139, 92, 246, 0.95) 100%), url('{{ url_for('static', filename='images/admin_bg.png') }}'); background-size: cover; background-position: center; padding: 3rem 0; position: relative; overflow: hidden;">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; position: relative; z-index: 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+            <div>
+                <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    Manage Users
+                </h1>
+                <p style="font-size: 1.1rem; opacity: 0.9;">
+                    View and manage all system users
+                </p>
+            </div>
+            <a href="{{ url_for('admin.dashboard') }}"
+                style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Users Table Section -->
+<section style="padding: 3rem 0; background: linear-gradient(to bottom, #f8fafc, #ffffff);">
+    <div class="container" style="max-width: 1400px; margin: 0 auto;">
+        <!-- Filters -->
+        <div class="fade-in-up"
+            style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label
+                        style="display: block; color: #64748b; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        Filter by Role
+                    </label>
+                    <select id="roleFilter" onchange="filterTable()"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s;">
+                        <option value="">All Roles</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Faculty">Faculty</option>
+                        <option value="Student">Student</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <label
+                        style="display: block; color: #64748b; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        Filter by Department
+                    </label>
+                    <select id="departmentFilter" onchange="filterTable()"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s;">
+                        <option value="">All Departments</option>
+                        {% for user in users %}
+                        {% if user.department and user.department.name %}
+                        <option value="{{ user.department.name }}">{{ user.department.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <label
+                        style="display: block; color: #64748b; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        Filter by Status
+                    </label>
+                    <select id="statusFilter" onchange="filterTable()"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s;">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div style="flex: 0; min-width: 120px; margin-top: 1.75rem;">
+                    <button onclick="clearFilters()"
+                        style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #64748b, #475569); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; width: 100%;">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <div id="filterStats"
+                style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem;">
+                Showing <strong id="visibleCount">{{ users|length }}</strong> of <strong>{{ users|length }}</strong>
+                users
+            </div>
+        </div>
+
+        <div class="card fade-in-up"
+            style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table id="usersTable" style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white;">
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">Full
+                                Name</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">
+                                Username</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">Email
+                            </th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">Role
+                            </th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">
+                                Department</th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">Status
+                            </th>
+                            <th style="padding: 1.25rem; text-align: left; font-weight: 600; font-size: 0.95rem;">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                            <td style="padding: 1.25rem; color: #1e293b; font-weight: 500; font-size: 0.95rem;">{{
+                                user.full_name }}</td>
+                            <td style="padding: 1.25rem; color: #64748b; font-size: 0.95rem;">{{ user.username }}</td>
+                            <td style="padding: 1.25rem; color: #64748b; font-size: 0.95rem;">{{ user.email }}</td>
+                            <td style="padding: 1.25rem;">
+                                <span
+                                    style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; 
+                                    {% if user.role == 'Admin' %}background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+                                    {% elif user.role == 'Faculty' %}background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;
+                                    {% else %}background: linear-gradient(135deg, #10b981, #059669); color: white;{% endif %}">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem; color: #64748b; font-size: 0.9rem; max-width: 200px;">
+                                {{ user.department.name if user.department else 'N/A' }}
+                            </td>
+                            <td style="padding: 1.25rem;">
+                                <span style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+                                    {% if user.is_active %}background: #d1fae5; color: #065f46;
+                                    {% else %}background: #fee2e2; color: #991b1b;{% endif %}">
+                                    {{ 'Active' if user.is_active else 'Inactive' }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem; display: flex; gap: 0.5rem;">
+                                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}"
+                                    style="padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s; text-decoration: none; display: inline-block;">
+                                    Edit
+                                </a>
+                                <button onclick="showResetPassword({{ user.id }}, '{{ user.username }}')"
+                                    style="padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s;">
+                                    Reset Password
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add User Button -->
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{{ url_for('admin.add_user') }}"
+                style="padding: 1rem 2.5rem; background: linear-gradient(135deg, #10b981, #3b82f6); color: white; border-radius: 12px; text-decoration: none; display: inline-block; font-size: 1.1rem; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.3s;">
+                Add New User
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Reset Password Modal -->
+<div id="resetModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+    <div
+        style="background: white; border-radius: 16px; max-width: 500px; width: 90%; margin: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease;">
+        <div
+            style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 1.5rem; border-radius: 16px 16px 0 0;">
+            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 700;">
+                Reset Password
+            </h3>
+        </div>
+        <div style="padding: 2rem;">
+            <form method="POST" id="resetForm">
+                <p style="color: #64748b; margin-bottom: 1.5rem;">
+                    Reset password for user: <strong id="resetUsername" style="color: #1e293b;"></strong>
+                </p>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #1e293b; font-weight: 600; margin-bottom: 0.5rem;">
+                        New Password
+                    </label>
+                    <input type="password" id="new_password" name="new_password" required
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; transition: all 0.3s;"
+                        onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)'"
+                        onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeResetModal()"
+                        style="padding: 0.75rem 1.5rem; background: #e2e8f0; color: #64748b; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">
+                        Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Scroll Animations */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Table Row Hover */
+    tbody tr:hover {
+        background: #f8fafc !important;
+    }
+
+    /* Button Hover */
+    a[href*="add_user"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    button[onclick*="showResetPassword"]:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Modal Animation */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Filter Dropdowns */
+    select:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        outline: none;
+    }
+
+    button[onclick="clearFilters()"]:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+    }
+
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe fade-in elements
+        document.querySelectorAll('.fade-in-up').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+
+    // Filter Table Function
+    function filterTable() {
+        const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
+        const departmentFilter = document.getElementById('departmentFilter').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+        const table = document.getElementById('usersTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const role = row.cells[3].textContent.trim().toLowerCase();
+            const department = row.cells[4].textContent.trim().toLowerCase();
+            const status = row.cells[5].textContent.trim().toLowerCase();
+
+            let showRow = true;
+
+            // Check role filter
+            if (roleFilter && !role.includes(roleFilter)) {
+                showRow = false;
+            }
+
+            // Check department filter
+            if (departmentFilter && !department.includes(departmentFilter)) {
+                showRow = false;
+            }
+
+            // Check status filter
+            if (statusFilter && !status.includes(statusFilter)) {
+                showRow = false;
+            }
+
+            // Show or hide row
+            if (showRow) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        // Update stats
+        const totalCount = rows.length;
+        document.getElementById('visibleCount').textContent = visibleCount;
+    }
+
+    // Clear Filters Function
+    function clearFilters() {
+        document.getElementById('roleFilter').value = '';
+        document.getElementById('departmentFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        filterTable();
+    }
+
+    // Remove duplicate department options
+    document.addEventListener('DOMContentLoaded', function () {
+        const departmentSelect = document.getElementById('departmentFilter');
+        const departments = new Set();
+        const options = Array.from(departmentSelect.options);
+
+        options.forEach((option, index) => {
+            if (index === 0) return; // Skip "All Departments"
+            if (departments.has(option.value)) {
+                option.remove();
+            } else {
+                departments.add(option.value);
+            }
+        });
+    });
+
+
+    // Reset Password Modal Functions
+    function showResetPassword(userId, username) {
+        document.getElementById('resetModal').style.display = 'flex';
+        document.getElementById('resetUsername').textContent = username;
+        document.getElementById('resetForm').action = `/admin/users/reset-password/${userId}`;
+        document.getElementById('new_password').value = '';
+        document.getElementById('new_password').focus();
+    }
+
+    function closeResetModal() {
+        document.getElementById('resetModal').style.display = 'none';
+    }
+
+    // Close modal on outside click
+    document.getElementById('resetModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeResetModal();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeResetModal();
+        }
+    });
+</script>
+{% endblock %}

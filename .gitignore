@@ -1,0 +1,50 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# ── Virtual Environment ────────────────────────────────────────────────────────
+myenv/
+venv/
+.venv/
+env/
+
+# ── Environment / Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+*.env
+!.env.example          # allow the example template
+
+# ── Database (local SQLite) ───────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# ── Uploads (user data / face images) ────────────────────────────────────────
+uploads/
+static/uploads/
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Test / coverage ───────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/

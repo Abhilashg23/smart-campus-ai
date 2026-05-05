@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Counselor Login - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="row align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg"
+            style="background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div
+                        style="background: rgba(236, 72, 153, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2">
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </div>
+                    <h2 class="fw-bold mb-1" style="color: white;">Counselor Login</h2>
+                    <p class="text-muted">Smart Campus Well-being System</p>
+                </div>
+
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="username" class="form-label text-light">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-light">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" class="form-control bg-dark border-secondary text-light" id="username"
+                                name="username" placeholder="Enter username" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label text-light">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-light">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" class="form-control bg-dark border-secondary text-light"
+                                id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold"
+                        style="background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none;">
+                        Login to Dashboard
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('common.index') }}" class="text-decoration-none text-muted">Back to Home</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

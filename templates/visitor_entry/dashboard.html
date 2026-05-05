@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Visitor Entry Dashboard - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem; max-width: 1800px;">
+    <!-- Modern Header -->
+    <div class="dashboard-header" style="margin-bottom: 2.5rem;">
+        <div>
+            <h1
+                style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-users" style="color: white; font-size: 1.8rem;"></i>
+                </div>
+                Visitor Entry Dashboard
+            </h1>
+            <p style="color: #64748b; font-size: 1.1rem; margin: 0;">Manage visitor check-ins and check-outs</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ url_for('visitor_entry.history') }}" class="modern-btn btn-outline">
+                <i class="fas fa-history"></i> View History
+            </a>
+            <a href="{{ url_for('visitor_entry.manual_entry') }}" class="modern-btn btn-primary">
+                <i class="fas fa-plus"></i> Manual Entry
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="stats-grid"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <!-- Currently Checked In -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.active_visitors }}</h3>
+                <p class="stat-label">Currently Checked In</p>
+            </div>
+        </div>
+
+        <!-- Today's Visitors -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.today_visitors }}</h3>
+                <p class="stat-label">Today's Visitors</p>
+            </div>
+        </div>
+
+        <!-- Returning Visitors -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+            <div class="stat-icon">
+                <i class="fas fa-redo"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.returning_visitors }}</h3>
+                <p class="stat-label">Returning Visitors (30d)</p>
+            </div>
+        </div>
+
+        <!-- Total Visitors -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.total_visitors }}</h3>
+                <p class="stat-label">Total Visitors (30d)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Visitors Card -->
+    <div class="modern-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-users" style="color: #10b981;"></i>
+                Active Visitors
+            </h3>
+            <span class="badge badge-success">{{ active_visitors|length }}</span>
+        </div>
+        <div class="card-body">
+            {% if active_visitors %}
+            <div class="visitors-grid">
+                {% for visitor in active_visitors %}
+                <div class="visitor-card">
+                    <img src="{{ url_for('visitor_api.get_photo', visitor_id=visitor.id) }}" alt="{{ visitor.name }}"
+                        class="visitor-photo-large">
+                    <div class="visitor-details">
+                        <div class="visitor-header">
+                            <strong class="visitor-name">{{ visitor.name }}</strong>
+                            {% if visitor.is_returning_visitor %}
+                            <span class="badge badge-warning">
+                                <i class="fas fa-star"></i> Visit #{{ visitor.previous_visit_count + 1 }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <p class="visitor-reason">{{ visitor.reason }}</p>
+                        <div class="visitor-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-building"></i>
+                                <span>{{ visitor.organization or 'N/A' }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ visitor.host_name or 'N/A' }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ visitor.entry_time.strftime('%I:%M %p') }}</span>
+                            </div>
+                        </div>
+                        <button class="btn-checkout" onclick="checkOutVisitor({{ visitor.id }}, '{{ visitor.name }}')">
+                            <i class="fas fa-sign-out-alt"></i> Check Out
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1.5rem;"></i>
+                <h3 style="color: #64748b; font-size: 1.3rem; margin: 0 0 0.5rem 0;">No active visitors</h3>
+                <p style="color: #94a3b8; margin: 0;">All visitors have checked out</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .modern-btn {
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-outline {
+        background: white;
+        color: #475569;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-outline:hover {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .stat-card {
+        padding: 2rem;
+        border-radius: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.75rem 2rem;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .badge-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.8rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .visitors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .visitor-card {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border-left: 4px solid #10b981;
+        display: flex;
+        gap: 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .visitor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+    }
+
+    .visitor-photo-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 16px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .visitor-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .visitor-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .visitor-name {
+        font-size: 1.2rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .visitor-reason {
+        color: #475569;
+        font-size: 1rem;
+        margin: 0 0 1rem 0;
+        line-height: 1.5;
+    }
+
+    .visitor-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: #10b981;
+    }
+
+    .btn-checkout {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        align-self: flex-start;
+    }
+
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+</style>
+
+<script>
+    async function checkOutVisitor(visitorId, visitorName) {
+        if (!confirm(`Check out ${visitorName}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/visitor/check-out', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ visitor_id: visitorId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                location.reload();
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Check-out error:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+</script>
+{% endblock %}

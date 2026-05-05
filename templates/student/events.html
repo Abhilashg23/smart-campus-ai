@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Events - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Clean Background -->
+<div class="events-background"></div>
+
+<div class="events-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Campus Events</h1>
+        <p>Discover and participate in exciting campus activities</p>
+    </div>
+
+    <!-- Events List -->
+    {% if events %}
+    <div class="events-grid">
+        {% for event in events %}
+        <div class="event-card">
+            <div class="event-header">
+                <div class="event-date">
+                    <div class="day">{{ event.event_date.strftime('%d') }}</div>
+                    <div class="month">{{ event.event_date.strftime('%b') }}</div>
+                </div>
+                <div class="event-info">
+                    <h3>{{ event.title }}</h3>
+                    <div class="event-meta">
+                        <span class="time">{{ event.event_date.strftime('%I:%M %p') }}</span>
+                        <span class="location">{{ event.location }}</span>
+                    </div>
+                </div>
+            </div>
+            <p class="event-description">{{ event.description }}</p>
+            <div class="event-footer">
+                <span class="status-badge">Upcoming</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-events">
+        <h2>No Events Available</h2>
+        <p>There are no upcoming events at the moment. Check back soon!</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Background */
+    .events-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        z-index: -1;
+    }
+
+    /* Container */
+    .events-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        margin-top: 70px;
+        min-height: calc(100vh - 70px);
+    }
+
+    /* Page Header */
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+        font-size: 1.25rem;
+        color: #64748b;
+    }
+
+    /* Events Grid */
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-header {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .event-date {
+        flex-shrink: 0;
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .day {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .month {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+    }
+
+    .event-info {
+        flex: 1;
+    }
+
+    .event-info h3 {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.9375rem;
+        color: #64748b;
+    }
+
+    .time {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+
+    .event-description {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .event-footer {
+        padding-top: 1.25rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+        color: white;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    /* No Events */
+    .no-events {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .no-events h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+
+    .no-events p {
+        font-size: 1.125rem;
+        color: #64748b;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .events-container {
+            padding: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+        }
+
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .event-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

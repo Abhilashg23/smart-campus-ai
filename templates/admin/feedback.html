@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}All Feedback - Admin{% endblock %}
+{% block content %}
+<style>
+.adm-wrap { max-width: 1300px; margin: 0 auto; padding: 2rem; }
+.adm-hero { background: linear-gradient(135deg, #0f172a, #1e3a8a); border-radius: 24px; padding: 2.5rem 3rem; color: white; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.adm-hero h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 0.4rem 0; }
+.adm-hero p  { opacity: 0.75; margin: 0 0 1.25rem 0; }
+.adm-hero .bg-icon { position: absolute; right: -10px; bottom: -20px; font-size: 12rem; color: rgba(255,255,255,0.04); }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+.stat-card { background: white; border-radius: 20px; padding: 1.75rem; text-align: center; border: 1px solid #e8edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+.stat-card h2 { font-size: 2.5rem; font-weight: 800; margin: 0 0 0.25rem 0; color: #0f172a; }
+.stat-card p { margin: 0; color: #94a3b8; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start; }
+@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } }
+.card { background: white; border-radius: 20px; border: 1px solid #e8edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 1.5rem; }
+.card-head { padding: 1.25rem 1.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+.fac-row { padding: 1rem 1.5rem; border-bottom: 1px solid #f8fafc; display: flex; align-items: center; gap: 1rem; }
+.fac-row:last-child { border: none; }
+.fac-avatar { width: 44px; height: 44px; border-radius: 12px; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+.stars { color: #f59e0b; }
+.fb-row { padding: 1.25rem 1.75rem; border-bottom: 1px solid #f8fafc; }
+.fb-row:last-child { border: none; }
+.back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.12); color: white; padding: 0.6rem 1.25rem; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); }
+</style>
+<div class="adm-wrap">
+    <div class="adm-hero">
+        <div style="position:relative;z-index:2;">
+            <h1><i class="fas fa-poll" style="margin-right:8px;"></i>Student Feedback Reports</h1>
+            <p>Monitor all student feedback across faculty and subjects</p>
+            <a href="{{ url_for('admin.dashboard') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+        <i class="fas fa-chart-bar adm-hero bg-icon"></i>
+    </div>
+
+    <!-- Summary stats -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">⭐</div>
+            <h2 style="color:#f59e0b;">{{ overall_avg }}</h2>
+            <p>Overall Avg Rating</p>
+        </div>
+        <div class="stat-card">
+            <h2>{{ total_responses }}</h2>
+            <p>Total Responses</p>
+        </div>
+        <div class="stat-card">
+            <h2>{{ faculty_list|length }}</h2>
+            <p>Faculty Rated</p>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <!-- Left: Faculty leaderboard -->
+        <div>
+            <div class="card">
+                <div class="card-head"><i class="fas fa-trophy" style="color:#f59e0b;margin-right:6px;"></i>Faculty Rankings</div>
+                {% for item in faculty_list %}
+                <div class="fac-row">
+                    <div class="fac-avatar">
+                        {% if item.faculty %}{{ item.faculty.full_name[0].upper() }}{% else %}?{% endif %}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;color:#0f172a;font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            {{ item.faculty.full_name if item.faculty else 'Unknown' }}
+                        </div>
+                        <div style="font-size:0.78rem;color:#64748b;">
+                            {{ item.subject_count }} subject{{ 's' if item.subject_count != 1 }} &bull; {{ item.total_responses }} response{{ 's' if item.total_responses != 1 }}
+                        </div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="font-size:1.2rem;font-weight:800;color:{% if item.avg_rating >= 4 %}#16a34a{% elif item.avg_rating >= 3 %}#d97706{% else %}#dc2626{% endif %};">
+                            {{ item.avg_rating }}
+                        </div>
+                        <div class="stars" style="font-size:0.65rem;">
+                            {% for i in range(1, 6) %}
+                            <i class="fas fa-star" style="color:{% if i <= item.avg_rating %}#f59e0b{% else %}#e2e8f0{% endif %};"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div style="padding:2.5rem;text-align:center;color:#94a3b8;">
+                    <i class="fas fa-chart-bar" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                    No feedback submitted yet.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: All individual feedbacks -->
+        <div>
+            <div class="card">
+                <div class="card-head"><i class="fas fa-comments" style="color:#4f46e5;margin-right:6px;"></i>All Feedback ({{ total_responses }} entries)</div>
+                {% if all_feedbacks %}
+                {% for fb in all_feedbacks %}
+                <div class="fb-row">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+                        <div>
+                            <span style="font-weight:700;color:#0f172a;font-size:0.95rem;">{{ fb.student.full_name }}</span>
+                            <span style="font-size:0.75rem;color:#94a3b8;margin-left:0.5rem;">→</span>
+                            <span style="font-size:0.85rem;color:#4f46e5;margin-left:0.5rem;font-weight:600;">
+                                {{ fb.subject.name if fb.subject else 'Unknown Subject' }}
+                            </span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+                            <span class="stars" style="font-size:0.8rem;">
+                                {% for i in range(1, 6) %}
+                                <i class="fas fa-star" style="color:{% if i <= fb.rating %}#f59e0b{% else %}#e2e8f0{% endif %};"></i>
+                                {% endfor %}
+                            </span>
+                            <span style="font-size:0.75rem;color:#94a3b8;">{{ fb.created_at.strftime('%d %b %Y') }}</span>
+                        </div>
+                    </div>
+                    {% if fb.subject %}
+                    <div style="margin-bottom:0.4rem;">
+                        <span style="font-size:0.75rem;background:#e0e7ff;color:#4f46e5;padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;">
+                            {{ fb.subject.faculty.full_name if fb.subject.faculty else 'No Faculty' }}
+                        </span>
+                        <span style="font-size:0.75rem;background:#f0fdf4;color:#16a34a;padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;margin-left:4px;">
+                            Sem {{ fb.subject.semester }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if fb.comments %}
+                    <p style="margin:0;color:#475569;font-size:0.88rem;line-height:1.5;padding:0.75rem;background:#f8fafc;border-radius:10px;border-left:3px solid #4f46e5;">
+                        "{{ fb.comments }}"
+                    </p>
+                    {% else %}
+                    <p style="margin:0;color:#94a3b8;font-size:0.82rem;font-style:italic;">No comment provided.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="padding:3rem;text-align:center;color:#94a3b8;">
+                    <i class="fas fa-inbox" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;"></i>
+                    No student feedback has been submitted yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

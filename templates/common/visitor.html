@@ -1,0 +1,1018 @@
+{% extends "base.html" %}
+
+{% block title %}Visitor Information - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Fullscreen Slideshow Section -->
+<section id="slideshowSection" class="fullscreen-slideshow-section">
+    <div class="slideshow-wrapper">
+        <div class="slide active">
+            <img src="{{ url_for('static', filename='images/slides/Main_Block.jpeg') }}" alt="Main Block">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">Welcome to Government Science College</h1>
+                <p class="slide-subtitle">Experience the Future of Education with our Smart Campus</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="{{ url_for('static', filename='images/slides/BCA_Block.jpeg') }}" alt="BCA Block">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">Advanced IT Infrastructure</h1>
+                <p class="slide-subtitle">Empowering innovation through state-of-the-art computer science facilities</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="{{ url_for('static', filename='images/slides/classroom.jpeg') }}" alt="Smart Classroom">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">Interactive Learning Spaces</h1>
+                <p class="slide-subtitle">Modern classrooms designed for collaborative and dynamic student success</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="{{ url_for('static', filename='images/slides/library.jpeg') }}" alt="Library">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">Comprehensive Knowledge Hub</h1>
+                <p class="slide-subtitle">Providing seamless access to an extensive collection of academic resources</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="{{ url_for('static', filename='images/slides/Sports_Arena.jpeg') }}" alt="Sports Arena">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">World-Class Athletics</h1>
+                <p class="slide-subtitle">Superior performance in our professional-grade sports and fitness facilities</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="{{ url_for('static', filename='images/slides/Cultural.JPG') }}" alt="Cultural Events">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <h1 class="slide-title">Vibrant Cultural Life</h1>
+                <p class="slide-subtitle">Fostering creativity, diversity, and talent through engaging campus events</p>
+            </div>
+        </div>
+
+        <!-- Slide indicators -->
+        <div class="slide-indicators">
+            <span class="indicator active" onclick="currentSlide(1)"></span>
+            <span class="indicator" onclick="currentSlide(2)"></span>
+            <span class="indicator" onclick="currentSlide(3)"></span>
+            <span class="indicator" onclick="currentSlide(4)"></span>
+            <span class="indicator" onclick="currentSlide(5)"></span>
+            <span class="indicator" onclick="currentSlide(6)"></span>
+        </div>
+
+        <!-- Navigation arrows -->
+        <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+        <a class="next" onclick="changeSlide(1)">&#10095;</a>
+
+        <!-- Detection Status Overlay -->
+        <div class="detection-status">
+            <i class="fas fa-camera"></i>
+            <span>AI Camera Active - Monitoring for Guests</span>
+        </div>
+
+        <!-- Hidden video for background face detection -->
+        <video id="backgroundVideo" autoplay muted playsinline
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;"></video>
+        <canvas id="backgroundCanvas" style="display: none;"></canvas>
+    </div>
+</section>
+
+<!-- Voice Assistant Section (Initially Hidden) -->
+<section id="assistantSection" class="assistant-section" style="display: none;">
+    <div class="assistant-fullscreen">
+        <div class="assistant-grid">
+            <!-- Camera Preview -->
+            <div class="camera-section-full">
+                <div class="camera-preview-full" id="cameraPreview">
+                    <video id="videoElement" autoplay muted playsinline></video>
+                    <canvas id="faceCanvas"></canvas>
+                    <div class="camera-overlay" id="cameraOverlay">
+                        <div style="text-align: center;">
+                            <i class="fas fa-video" style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.7;"></i>
+                            <p style="font-size: 1.2rem; font-weight: 600; margin: 0;">Camera Initializing...</p>
+                        </div>
+                    </div>
+                    <div class="face-status" id="faceStatus"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="assistant-controls-full">
+                    <button class="control-btn stop-btn" id="stopBtn">
+                        <i class="fas fa-times"></i> End Conversation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conversation Panel -->
+            <div class="conversation-section-full">
+                <div class="conversation-header-full">
+                    <div class="header-left">
+                        <div>
+                            <h2>AI Assistant</h2>
+                            <span class="status-indicator" id="statusIndicator">Online</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="endConversation()" class="action-btn end-btn">End Conversation</button>
+                        <button onclick="goHome()" class="action-btn home-btn">Home</button>
+                    </div>
+                </div>
+
+                <div class="conversation-messages-full" id="conversationMessages">
+                    <div class="welcome-message">
+                        <p>Welcome! I'm your AI assistant.</p>
+                        <p>Initializing conversation...</p>
+                    </div>
+                </div>
+
+                <div class="voice-indicator" id="voiceIndicator" style="display: none;">
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Greeting Overlay for Face Recognition -->
+<div class="greeting-overlay" id="greetingOverlay" style="display: none;">
+    <div class="greeting-content">
+        <div class="greeting-icon">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <h1 class="greeting-text" id="greetingText">Welcome!</h1>
+        <p class="greeting-role" id="greetingRole"></p>
+    </div>
+</div>
+</div>
+</section>
+
+
+<style>
+    /* Hide navigation bar and footer for fullscreen kiosk mode */
+    nav {
+        display: none !important;
+    }
+
+    footer {
+        display: none !important;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .dept-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        border-left-width: 8px;
+    }
+
+    a[href*="register"]:hover,
+    a[href*="face_recognition"]:hover,
+    a[href*="index"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Slideshow Styles */
+    .slideshow-container {
+        position: relative;
+        max-width: 1000px;
+        margin: 0 auto;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Fullscreen Slideshow Styles */
+    .fullscreen-slideshow-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .slideshow-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .slide {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .slide.active {
+        display: block;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        background: #0f172a;
+    }
+
+    .slide-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+        z-index: 1;
+    }
+
+    .slide-content {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        color: white;
+        z-index: 2;
+        width: 90%;
+        max-width: 1200px;
+    }
+
+    .slide-title {
+        font-size: 4.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.8s ease-out;
+    }
+
+    .slide-subtitle {
+        font-size: 1.8rem;
+        opacity: 0.95;
+        font-weight: 300;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.8s ease-out 0.2s backwards;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .slide-indicators {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 1rem;
+        z-index: 10;
+    }
+
+    .indicator {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        transition: all 0.4s;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .indicator.active {
+        background: white;
+        width: 40px;
+        border-radius: 7px;
+    }
+
+    .prev,
+    .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        text-decoration: none;
+        font-size: 1.8rem;
+        font-weight: bold;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        z-index: 10;
+        user-select: none;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .prev:hover,
+    .next:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .prev {
+        left: 2rem;
+    }
+
+    .next {
+        right: 2rem;
+    }
+
+    .detection-status {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        background: rgba(16, 185, 129, 0.9);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        z-index: 10;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .detection-status i {
+        font-size: 1.2rem;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    /* Greeting Overlay Styles */
+    .greeting-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 15;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .greeting-content {
+        text-align: center;
+        color: white;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .greeting-icon {
+        font-size: 6rem;
+        margin-bottom: 1.5rem;
+        color: #10b981;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    .greeting-text {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .greeting-role {
+        font-size: 1.5rem;
+        opacity: 0.9;
+        font-weight: 300;
+        color: #e2e8f0;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+
+    /* Assistant Section Styles */
+    .assistant-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+        background: #0f172a;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .assistant-fullscreen {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .assistant-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        height: 100%;
+        max-width: 100vw;
+    }
+
+    .camera-section-full {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        position: relative;
+    }
+
+    .camera-preview-full {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        aspect-ratio: 4/3;
+        background: #000;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        margin-bottom: 2rem;
+    }
+
+    .assistant-controls-full {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+    }
+
+    .conversation-section-full {
+        background: white;
+        display: flex;
+        flex-direction: column;
+        padding: 3rem;
+    }
+
+    .conversation-header-full {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .end-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .end-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .home-btn {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .home-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-left h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .conversation-messages-full {
+        flex: 1;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
+        padding-right: 1rem;
+    }
+
+    /* Voice Assistant Styles */
+    .voice-assistant-container {
+        max-width: 1200px;
+        margin: 0 auto
+    }
+
+    .assistant-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0
+    }
+
+    .camera-section {
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+        border-right: 1px solid #e2e8f0
+    }
+
+    .camera-preview {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #1e293b;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 1.5rem
+    }
+
+    #videoElement {
+        width: 100%;
+        height: 100%;
+        object-fit: cover
+    }
+
+    #faceCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%
+    }
+
+    .camera-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 41, 59, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        gap: 1rem;
+        z-index: 10;
+    }
+
+    .camera-overlay i {
+        display: block;
+    }
+
+    .camera-overlay p {
+        margin: 0;
+        text-align: center;
+    }
+
+    .face-status {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        background: rgba(16, 185, 129, 0.9);
+        color: white;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: none
+    }
+
+    .assistant-controls {
+        display: flex;
+        gap: 1rem;
+        justify-content: center
+    }
+
+    .control-btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem
+    }
+
+    .start-btn {
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+        color: white
+    }
+
+    .start-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4)
+    }
+
+    .stop-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white
+    }
+
+    .mic-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .mic-btn i {
+        color: white;
+        display: block;
+    }
+
+    .mic-btn:not(:disabled):hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .mic-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .mic-btn.listening {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1)
+        }
+
+        50% {
+            transform: scale(1.1)
+        }
+    }
+
+    .conversation-section {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column
+    }
+
+    .conversation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0
+    }
+
+    .conversation-header h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem
+    }
+
+    .status-indicator {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600
+    }
+
+    .status-indicator.online {
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+        color: white
+    }
+
+    .conversation-messages {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 400px
+    }
+
+    .welcome-message {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #64748b
+    }
+
+    .message {
+        margin-bottom: 1.5rem;
+        animation: slideIn 0.4s ease-out
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px)
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0)
+        }
+    }
+
+    .message-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem
+    }
+
+    .message-label.user {
+        color: #8b5cf6
+    }
+
+    .message-label.assistant {
+        color: #3b82f6
+    }
+
+    .message-content {
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        line-height: 1.6
+    }
+
+    .message.user .message-content {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        margin-left: 2rem
+    }
+
+    .message.assistant .message-content {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        margin-right: 2rem
+    }
+
+    .voice-indicator {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        padding: 1rem;
+        margin-top: 1rem
+    }
+
+    .voice-wave {
+        width: 4px;
+        height: 30px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 4px;
+        animation: wave 1.2s ease-in-out infinite
+    }
+
+    .voice-wave:nth-child(2) {
+        animation-delay: 0.1s
+    }
+
+    .voice-wave:nth-child(3) {
+        animation-delay: 0.2s
+    }
+
+    .voice-wave:nth-child(4) {
+        animation-delay: 0.3s
+    }
+
+    .voice-wave:nth-child(5) {
+        animation-delay: 0.4s
+    }
+
+    @keyframes wave {
+
+        0%,
+        100% {
+            height: 30px
+        }
+
+        50% {
+            height: 50px
+        }
+    }
+
+    @media (max-width:968px) {
+        .assistant-card {
+            grid-template-columns: 1fr
+        }
+
+        .camera-section {
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0
+        }
+    }
+</style>
+<parameter name="StartLine">505
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
+                observer.observe(el);
+            });
+        });
+
+        // Slideshow functionality
+        let slideIndex = 1;
+        let slideTimer;
+
+        function showSlide(n) {
+            const slides = document.getElementsByClassName('slide');
+            const indicators = document.getElementsByClassName('indicator');
+
+            if (n > slides.length) { slideIndex = 1; }
+            if (n < 1) { slideIndex = slides.length; }
+
+            // Hide all slides
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+
+            // Remove active from all indicators
+            for (let i = 0; i < indicators.length; i++) {
+                indicators[i].classList.remove('active');
+            }
+
+            // Show current slide
+            slides[slideIndex - 1].classList.add('active');
+            indicators[slideIndex - 1].classList.add('active');
+        }
+
+        function changeSlide(n) {
+            clearTimeout(slideTimer);
+            slideIndex += n;
+            showSlide(slideIndex);
+            autoAdvanceSlides();
+        }
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            slideIndex = n;
+            showSlide(slideIndex);
+            autoAdvanceSlides();
+        }
+
+        function autoAdvanceSlides() {
+            slideTimer = setTimeout(() => {
+                slideIndex++;
+                showSlide(slideIndex);
+                autoAdvanceSlides();
+            }, 5000); // Change slide every 5 seconds
+        }
+
+        // Initialize slideshow
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementsByClassName('slide').length > 0) {
+                showSlide(slideIndex);
+                autoAdvanceSlides();
+            }
+        });
+
+        // End Conversation function
+        function endConversation() {
+            // Clear conversation messages
+            const messagesContainer = document.getElementById('conversationMessages');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = `
+                <div class="welcome-message">
+                    <p>Conversation ended.</p>
+                    <p>Thank you for visiting!</p>
+                </div>
+            `;
+            }
+
+            // Stop any ongoing voice recognition
+            if (window.recognition) {
+                window.recognition.stop();
+            }
+
+            // Reload page after 2 seconds to reset
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+
+        // Home function
+        function goHome() {
+            // Reload the page to go back to slideshow
+            location.reload();
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/voice_assistant.js') }}"></script>
+    {% endblock %}

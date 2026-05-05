@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Student Tracking History - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 1.5rem; max-width: 1800px;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h2 style="color: white; margin: 0; font-size: 2rem; font-weight: 700;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="vertical-align: middle; margin-right: 0.75rem;">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Main Gate Security - Entry/Exit Records
+            </h2>
+            <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0; font-size: 1rem;">Complete entry/exit records
+            </p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ url_for('security.entry_exit_view') }}" class="btn btn-primary"
+                style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #10b981, #3b82f6); color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                View IN/OUT Entries
+            </a>
+            <a href="{{ url_for('security.dashboard') }}" class="btn btn-secondary"
+                style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card"
+        style="background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(36, 36, 62, 0.95)); border: 1px solid rgba(99, 102, 241, 0.3); margin-bottom: 2rem;">
+        <div class="card-body" style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+                <div>
+                    <label
+                        style="color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem; display: block;">Search
+                        Student</label>
+                    <input type="text" id="searchInput" placeholder="Name or Registration ID..."
+                        style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3); background: rgba(255, 255, 255, 0.05); color: white; font-size: 1rem;">
+                </div>
+                <div>
+                    <label
+                        style="color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem; display: block;">Start
+                        Date</label>
+                    <input type="date" id="startDate"
+                        style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3); background: rgba(255, 255, 255, 0.05); color: white; font-size: 1rem;">
+                </div>
+                <div>
+                    <label
+                        style="color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem; display: block;">End
+                        Date</label>
+                    <input type="date" id="endDate"
+                        style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3); background: rgba(255, 255, 255, 0.05); color: white; font-size: 1rem;">
+                </div>
+                <div>
+                    <button id="filterBtn" class="btn btn-primary"
+                        style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #3b82f6); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Records Table -->
+    <div class="card"
+        style="background: linear-gradient(135deg, rgba(15, 12, 41, 0.95), rgba(36, 36, 62, 0.95)); border: 1px solid rgba(99, 102, 241, 0.3);">
+        <div class="card-body" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--primary-color); margin: 0; font-size: 1.5rem; font-weight: 700;">
+                    All Records
+                </h3>
+                <span id="recordCount"
+                    style="background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem;">0</span>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table id="trackingTable"
+                    style="width: 100%; border-collapse: collapse; color: white; font-size: 0.95rem;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+                            <th style="padding: 1rem; text-align: left; font-weight: 600;">Student Name</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600;">Registration ID</th>
+                            <th style="padding: 1rem; text-align: center; font-weight: 600;">Entry Type</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600;">Time</th>
+                            <th style="padding: 1rem; text-align: left; font-weight: 600;">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trackingTableBody">
+                        <tr>
+                            <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+                                Loading tracking records...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        min-height: 100vh;
+    }
+
+    #trackingTable tbody tr {
+        border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        transition: background 0.2s;
+    }
+
+    #trackingTable tbody tr:hover {
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        color-scheme: dark;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const filterBtn = document.getElementById('filterBtn');
+    const trackingTableBody = document.getElementById('trackingTableBody');
+    const recordCount = document.getElementById('recordCount');
+
+    // Load tracking history
+    async function loadTrackingHistory() {
+        try {
+            const params = new URLSearchParams();
+
+            if (searchInput.value.trim()) {
+                params.append('search', searchInput.value.trim());
+            }
+            if (startDate.value) {
+                params.append('start_date', startDate.value);
+            }
+            if (endDate.value) {
+                params.append('end_date', endDate.value);
+            }
+
+            const response = await fetch(`/security/api/tracking-history-data?${params.toString()}`);
+            const data = await response.json();
+
+            if (data.success) {
+                recordCount.textContent = data.count;
+
+                if (data.count === 0) {
+                    trackingTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+                                No tracking records found.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    let html = '';
+                    data.tracking.forEach(record => {
+                        const isEntry = record.entry_type === 'IN';
+                        const badgeColor = isEntry ? '#10b981' : '#ef4444';
+                        const badgeText = isEntry ? 'IN' : 'OUT';
+
+                        html += `
+                            <tr>
+                                <td style="padding: 1rem;">
+                                    <strong style="color: var(--primary-color);">${record.name}</strong>
+                                </td>
+                                <td style="padding: 1rem; color: var(--text-secondary);">
+                                    ${record.registration_id}
+                                </td>
+                                <td style="padding: 1rem; text-align: center;">
+                                    <span style="background: ${badgeColor}; color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: bold; font-size: 0.85rem;">
+                                        ${badgeText}
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem; color: var(--text-secondary);">
+                                    ${record.date}
+                                </td>
+                                <td style="padding: 1rem; color: ${badgeColor}; font-weight: 600;">
+                                    ${record.time}
+                                </td>
+                                <td style="padding: 1rem; color: var(--text-secondary);">
+                                    ${record.location}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    trackingTableBody.innerHTML = html;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading tracking history:', error);
+            trackingTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="padding: 3rem; text-align: center; color: #ef4444;">
+                        Error loading tracking records. Please try again.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Apply filters
+    filterBtn.addEventListener('click', loadTrackingHistory);
+
+    // Search on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            loadTrackingHistory();
+        }
+    });
+
+    // Load on page load
+    loadTrackingHistory();
+</script>
+{% endblock %}

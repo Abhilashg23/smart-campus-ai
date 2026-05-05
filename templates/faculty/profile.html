@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Smart Campus{% endblock %}
+
+{% block content %}
+<!-- Clean Background -->
+<div class="profile-background"></div>
+
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="avatar-section">
+            {% if current_user.profile_picture %}
+            <img src="{{ current_user.profile_picture }}" alt="Profile" class="avatar">
+            {% else %}
+            <div class="avatar-placeholder">{{ current_user.full_name[0].upper() }}</div>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h1>{{ current_user.full_name }}</h1>
+            <p class="designation">{{ current_user.designation or 'Faculty Member' }}</p>
+            <div class="badges">
+                <span class="badge badge-role">{{ current_user.role|capitalize }}</span>
+                <span class="badge badge-dept">{{ current_user.department.name if current_user.department else 'Not
+                    Assigned' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Personal Information -->
+        <div class="info-section">
+            <h2>Personal Information</h2>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label>Full Name</label>
+                    <div class="value">{{ current_user.full_name }}</div>
+                </div>
+                <div class="info-field">
+                    <label>Email</label>
+                    <div class="value">{{ current_user.email }}</div>
+                </div>
+                <div class="info-field">
+                    <label>Department</label>
+                    <div class="value">{{ current_user.department.name if current_user.department else 'Not Assigned' }}
+                    </div>
+                </div>
+                <div class="info-field">
+                    <label>Designation</label>
+                    <div class="value">{{ current_user.designation or 'Faculty' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Information -->
+        {% if current_user.education or current_user.research_interests %}
+        <div class="info-section">
+            <h2>Academic Information</h2>
+            <div class="info-grid">
+                {% if current_user.education %}
+                <div class="info-field full-width">
+                    <label>Education</label>
+                    <div class="value">{{ current_user.education }}</div>
+                </div>
+                {% endif %}
+                {% if current_user.research_interests %}
+                <div class="info-field full-width">
+                    <label>Research Interests</label>
+                    <div class="value">{{ current_user.research_interests }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Bio -->
+        {% if current_user.bio %}
+        <div class="info-section">
+            <h2>About</h2>
+            <p class="bio-text">{{ current_user.bio }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Background */
+    .profile-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        z-index: -1;
+    }
+
+    /* Container */
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+        margin-top: 70px;
+        min-height: calc(100vh - 70px);
+    }
+
+    /* Profile Header */
+    .profile-header {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        gap: 2.5rem;
+        align-items: center;
+    }
+
+    .avatar-section {
+        flex-shrink: 0;
+    }
+
+    .avatar,
+    .avatar-placeholder {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #f1f5f9;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-placeholder {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .designation {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin-bottom: 1.25rem;
+    }
+
+    .badges {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .badge {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .badge-role {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .badge-dept {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .info-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .info-field {
+        background: #f8fafc;
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-field.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .info-field label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-field .value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .bio-text {
+        color: #475569;
+        line-height: 1.8;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .avatar,
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-info h1 {
+            font-size: 1.75rem;
+        }
+
+        .badges {
+            justify-content: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

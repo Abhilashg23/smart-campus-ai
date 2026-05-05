@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 3rem;">
+ <div class="card fade-in">
+ <div class="card-header" style="text-align: center; font-size: 2rem;">
+ New User Registration
+ </div>
+ <div class="card-body">
+ <form method="POST" action="{{ url_for('auth.register', qr_token=qr_token) }}">
+ <div class="form-group">
+ <label class="form-label" for="full_name">Full Name</label>
+ <input type="text" class="form-control" id="full_name" name="full_name" required>
+ </div>
+
+ <div class="form-group">
+ <label class="form-label" for="username">Username</label>
+ <input type="text" class="form-control" id="username" name="username" required>
+ </div>
+
+ <div class="form-group">
+ <label class="form-label" for="email">Email</label>
+ <input type="email" class="form-control" id="email" name="email" required>
+ </div>
+
+ <div class="form-group">
+ <label class="form-label" for="role">Role</label>
+ <select class="form-control" id="role" name="role" required>
+ <option value="">Select Role</option>
+ <option value="Student">Student</option>
+ <option value="Faculty">Faculty</option>
+ </select>
+ </div>
+
+ <div class="form-group">
+ <label class="form-label" for="password">Password</label>
+ <input type="password" class="form-control" id="password" name="password" required>
+ <small style="color: var(--text-secondary);">At least 8 characters with uppercase, lowercase, and
+ numbers</small>
+ </div>
+
+ <div class="form-group">
+ <label class="form-label" for="confirm_password">Confirm Password</label>
+ <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+ </div>
+
+ <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+ </form>
+ </div>
+ </div>
+</div>
+{% endblock %}

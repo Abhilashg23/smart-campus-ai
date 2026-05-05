@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}My Internal Marks - Student Dashboard{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: 2rem; color: white; margin-bottom: 0.5rem;">My Internal Marks</h1>
+            <p style="color: rgba(255, 255, 255, 0.8);">Semester: <strong>{{ current_user.semester }}</strong> | Program: <strong>{{ current_user.program.name if current_user.program else 'N/A' }}</strong></p>
+        </div>
+        <div>
+            <a href="{{ url_for('student.dashboard') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #f1f5f9; color: #475569; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div style="padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; {% if category == 'success' %}background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0;{% elif category == 'danger' %}background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;{% else %}background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a;{% endif %}">
+                    <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}" style="margin-right: 0.5rem;"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div style="background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+            <h2 style="font-size: 1.25rem; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-file-alt" style="color: #3b82f6;"></i> Current Semester Marks
+            </h2>
+        </div>
+        
+        <div style="padding: 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f1f5f9; text-align: left;">
+                        <th style="padding: 1rem 2rem; color: #475569; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; width: 15%;">Subject Code</th>
+                        <th style="padding: 1rem 2rem; color: #475569; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; width: 35%;">Subject Name</th>
+                        <th style="padding: 1rem 2rem; color: #475569; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; width: 25%;">Faculty</th>
+                        <th style="padding: 1rem 2rem; color: #475569; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; width: 25%;">Internal Marks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in subjects_marks %}
+                    <tr style="border-bottom: 1px solid #e2e8f0; transition: background-color 0.2s;">
+                        <td style="padding: 1.5rem 2rem; font-weight: 600; color: #64748b;">{{ item.subject.code }}</td>
+                        <td style="padding: 1.5rem 2rem; color: #1e293b; font-weight: 600;">{{ item.subject.name }}</td>
+                        <td style="padding: 1.5rem 2rem; color: #475569;">{{ item.subject.faculty.full_name if item.subject.faculty else 'N/A' }}</td>
+                        <td style="padding: 1.5rem 2rem;">
+                            {% if item.mark == 'Not Entered' %}
+                                <span style="padding: 0.25rem 0.75rem; background: #fef3c7; color: #92400e; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
+                                    Not Entered
+                                </span>
+                            {% else %}
+                                <span style="font-size: 1.25rem; font-weight: 700; color: #10b981;">
+                                    {{ item.mark }} <span style="font-size: 0.9rem; color: #94a3b8; font-weight: 500;">/ {{ item.max_marks }}</span>
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="padding: 3rem; text-align: center; color: #64748b;">
+                            <i class="fas fa-book-open" style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
+                            No subjects found for your current program and semester.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

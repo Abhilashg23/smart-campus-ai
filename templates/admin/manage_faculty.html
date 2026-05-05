@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Faculty - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem; max-width: 1600px; min-height: 100vh;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: linear-gradient(135deg, #0f172a, #1e293b); backdrop-filter: blur(10px); padding: 2.5rem; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); color: white;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 12px; border-radius: 16px;">
+                    <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                </div>
+                <h1 style="margin: 0; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em;">Manage Faculty</h1>
+            </div>
+            <p style="margin: 0; opacity: 0.7; font-size: 1.1rem;">Profiles, Departments, and Face Enrollment</p>
+        </div>
+        <div style="display: flex; gap: 1.25rem;">
+            <a href="{{ url_for('admin.dashboard') }}" id="backToDashboardBtn" style="padding: 0.875rem 1.75rem; background: rgba(255, 255, 255, 0.1); color: white; border-radius: 14px; text-decoration: none; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.add_user') }}" style="padding: 0.875rem 1.75rem; background: #10b981; color: white; border-radius: 14px; text-decoration: none; font-weight: 700; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-plus"></i> Add Faculty
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius: 16px; padding: 1.25rem 2rem; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Filter Bar -->
+    <div class="card" style="border-radius: 20px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+        <div class="card-body" style="padding: 1.5rem 2rem;">
+            <form method="GET" action="{{ url_for('admin.manage_faculty') }}" class="row g-3 align-items-center">
+                <div class="col-lg-5">
+                    <div class="input-group" style="background: #f8fafc; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                        <span class="input-group-text" style="background: transparent; border: none; color: #94a3b8; padding-left: 1.25rem;"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" name="search" placeholder="Search by name, email, or designation..." value="{{ search_query }}" style="background: transparent; border: none; padding: 0.75rem 1rem; font-size: 0.95rem;">
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <select class="form-select" name="department_id" style="border-radius: 12px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if selected_department_id == dept.id %}selected{% endif %}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <select class="form-select" name="sort_by" style="border-radius: 12px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+                        <option value="department" {% if sort_by == 'department' %}selected{% endif %}>Sort by School</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <button type="submit" class="btn btn-primary w-100" style="padding: 0.75rem; border-radius: 12px; font-weight: 600; background: #3b82f6; border: none; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Faculty Table Card -->
+    <div class="card" style="border-radius: 24px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden;">
+        <div class="card-header" style="background: white; padding: 1.5rem 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <h5 style="margin: 0; color: #1e293b; font-weight: 700;">Faculty List ({{ faculty_list|length }})</h5>
+            {% if search_query or selected_department_id %}
+            <a href="{{ url_for('admin.manage_faculty') }}" style="color: #64748b; font-size: 0.9rem; text-decoration: none;">Clear all filters</a>
+            {% endif %}
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background: #f8fafc;">
+                        <tr>
+                            <th style="padding: 1.25rem 2rem; border-top: none; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Faculty Profile</th>
+                            <th style="padding: 1.25rem 1rem; border-top: none; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Designation</th>
+                            <th style="padding: 1.25rem 1rem; border-top: none; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Department</th>
+                            <th style="padding: 1.25rem 1rem; border-top: none; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Enrollment</th>
+                            <th style="padding: 1.25rem 2rem; border-top: none; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faculty in faculty_list %}
+                        <tr style="transition: all 0.2s;">
+                            <td style="padding: 1.25rem 2rem; vertical-align: middle;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    {% if faculty.profile_image %}
+                                    <img src="{{ faculty.profile_image }}" style="width: 52px; height: 52px; border-radius: 14px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                                    {% else %}
+                                    <div style="width: 52px; height: 52px; border-radius: 14px; background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem;">{{ faculty.full_name }}</div>
+                                        <div style="font-size: 0.85rem; color: #64748b;">{{ faculty.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; vertical-align: middle;">
+                                <span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">
+                                    {{ faculty.designation or 'Faculty' }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; vertical-align: middle;">
+                                <div style="color: #475569; font-weight: 500;">{{ faculty.department.name if faculty.department else 'Not assigned' }}</div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; vertical-align: middle;">
+                                {% set face_data = faculty.face_data.first() %}
+                                {% if face_data %}
+                                <span style="color: #10b981; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i class="fas fa-check-circle"></i> Enrolled
+                                </span>
+                                {% else %}
+                                <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i class="fas fa-times-circle"></i> Missing
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1.25rem 2rem; vertical-align: middle; text-align: right;">
+                                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                    <button class="action-btn edit" data-bs-toggle="modal" data-bs-target="#editModal{{ faculty.id }}" title="Edit Profile">
+                                        <i class="fas fa-user-edit"></i>
+                                    </button>
+                                    <button class="action-btn enroll" data-bs-toggle="modal" data-bs-target="#enrollFaceModal{{ faculty.id }}" title="Enroll Face">
+                                        <i class="fas fa-fingerprint"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not faculty_list %}
+            <div style="padding: 5rem; text-align: center; color: #94a3b8;">
+                <i class="fas fa-users-slash fa-4x mb-3"></i>
+                <h3>No faculty members found</h3>
+                <p>Try adjusting your search filters or add a new faculty member.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modals Section -->
+{% for faculty in faculty_list %}
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal{{ faculty.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <form method="POST" action="{{ url_for('admin.update_faculty', faculty_id=faculty.id) }}" enctype="multipart/form-data">
+                <div class="modal-header" style="background: #f8fafc; padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0;">
+                    <h5 class="modal-title" style="font-weight: 800; color: #0f172a;">Edit Profile: {{ faculty.full_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 2rem;">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name</label>
+                            <input type="text" class="form-control custom-input" name="full_name" value="{{ faculty.full_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control custom-input" name="email" value="{{ faculty.email }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Designation</label>
+                            <input type="text" class="form-control custom-input" name="designation" value="{{ faculty.designation or '' }}" placeholder="Associate Professor">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Department</label>
+                            <select class="form-select custom-input" name="department_id">
+                                <option value="">Select Department</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if faculty.department_id == dept.id %}selected{% endif %}>{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Education</label>
+                            <textarea class="form-control custom-input" name="education" rows="2">{{ faculty.education or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Profile Picture</label>
+                            <input type="file" class="form-control custom-input" name="profile_image" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f8fafc; padding: 1.5rem 2rem; border-top: 1px solid #e2e8f0;">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 12px; font-weight: 600; padding: 0.75rem 1.5rem;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="border-radius: 12px; font-weight: 700; padding: 0.75rem 2rem; background: #3b82f6; border: none; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Face Enrollment Modal -->
+<div class="modal fade" id="enrollFaceModal{{ faculty.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 28px; border: none; overflow: hidden; background: #000;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1.5rem 2rem;">
+                <h5 class="modal-title" style="color: white; font-weight: 800;">Face Enrollment Terminal</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 0; position: relative;">
+                <!-- Camera Preview -->
+                <div style="position: relative; width: 100%; aspect-ratio: 4/3; background: #111;">
+                    <video id="enrollVideo{{ faculty.id }}" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <canvas id="enrollCanvas{{ faculty.id }}" style="position: absolute; inset: 0; z-index: 5;"></canvas>
+                    
+                    <!-- HUD Elements -->
+                    <div style="position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 100px; color: #10b981; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; border: 1px solid rgba(16,185,129,0.3);">
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite;"></span>
+                        SYSTEM ACTIVE
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div id="enrollStatus{{ faculty.id }}" style="display: none; position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(255,255,255,0.9); padding: 12px 24px; border-radius: 16px; color: #000; font-weight: 700; text-align: center; min-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                </div>
+
+                <!-- Footer Controls -->
+                <div style="padding: 2rem; background: #000; display: flex; justify-content: center; gap: 1rem;">
+                    <button class="btn btn-outline-light" onclick="captureFacultyFace({{ faculty.id }})" id="captureBtn{{ faculty.id }}" style="padding: 1rem 2.5rem; border-radius: 100px; font-weight: 700; border-width: 2px;">
+                        <i class="fas fa-camera me-2"></i> CAPTURE
+                    </button>
+                    <button class="btn btn-success" onclick="enrollFacultyFace({{ faculty.id }})" id="enrollBtn{{ faculty.id }}" style="display: none; padding: 1rem 3rem; border-radius: 100px; font-weight: 800; background: #10b981; border: none;">
+                        <i class="fas fa-check-circle me-2"></i> CONFIRM ENROLLMENT
+                    </button>
+                    <button class="btn btn-link text-white" data-bs-dismiss="modal" style="text-decoration: none; font-weight: 600;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<style>
+    .action-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    .action-btn.edit { background: #eff6ff; color: #3b82f6; }
+    .action-btn.edit:hover { background: #3b82f6; color: white; transform: translateY(-3px); }
+    
+    .action-btn.enroll { background: #ecfdf5; color: #10b981; }
+    .action-btn.enroll:hover { background: #10b981; color: white; transform: translateY(-3px); }
+
+    .custom-input {
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        transition: all 0.2s;
+    }
+    .custom-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        background: white;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js" defer></script>
+<script>
+    let currentStream = null;
+    let capturedBlob = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for Back to Dashboard button
+        const backBtn = document.getElementById('backToDashboardBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e) {
+                console.log('Navigating back to dashboard...');
+            });
+        }
+
+        // Initialize modals
+        document.querySelectorAll('[id^="enrollFaceModal"]').forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function() {
+                const id = this.id.replace('enrollFaceModal', '');
+                startEnrollmentCamera(id);
+            });
+            modal.addEventListener('hidden.bs.modal', function() {
+                stopEnrollmentCamera();
+            });
+        });
+    });
+
+    async function startEnrollmentCamera(id) {
+        try {
+            const video = document.getElementById(`enrollVideo${id}`);
+            currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = currentStream;
+        } catch (e) {
+            alert("Could not access camera: " + e.message);
+        }
+    }
+
+    function stopEnrollmentCamera() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(t => t.stop());
+            currentStream = null;
+        }
+    }
+
+    function captureFacultyFace(id) {
+        const video = document.getElementById(`enrollVideo${id}`);
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(blob => {
+            capturedBlob = blob;
+            document.getElementById(`enrollStatus${id}`).style.display = 'block';
+            document.getElementById(`enrollStatus${id}`).textContent = 'Face Captured! Click Confirm to save.';
+            document.getElementById(`captureBtn${id}`).style.display = 'none';
+            document.getElementById(`enrollBtn${id}`).style.display = 'inline-block';
+        }, 'image/jpeg');
+    }
+
+    async function enrollFacultyFace(id) {
+        if (!capturedBlob) return;
+        
+        const btn = document.getElementById(`enrollBtn${id}`);
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> SAVING...';
+
+        const formData = new FormData();
+        formData.append('image', capturedBlob, 'face.jpg');
+
+        try {
+            const r = await fetch(`/api/face/enroll/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+            const d = await r.json();
+            if (d.success) {
+                document.getElementById(`enrollStatus${id}`).className = 'alert alert-success';
+                document.getElementById(`enrollStatus${id}`).textContent = 'Enrollment Successful!';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                alert(d.error || 'Enrollment failed');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> CONFIRM ENROLLMENT';
+            }
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

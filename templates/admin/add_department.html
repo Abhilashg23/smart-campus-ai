@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Add Department - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem; max-width: 1000px; min-height: 100vh;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: linear-gradient(135deg, #1e293b, #334155); backdrop-filter: blur(10px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); color: white;">
+        <div>
+            <h1 style="margin: 0; font-size: 2rem; font-weight: 800;">Create New Department</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.8;">Initialize a new academic or administrative unit</p>
+        </div>
+        <a href="{{ url_for('admin.departments') }}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="card" style="background: white; border-radius: 24px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden;">
+        <div style="background: #f8fafc; padding: 1.5rem 2rem; border-bottom: 1px solid #f1f5f9;">
+            <h5 style="margin: 0; color: #1e293b; font-weight: 700;">Department Information</h5>
+        </div>
+        <div class="card-body" style="padding: 2.5rem;">
+            <form method="POST" action="{{ url_for('admin.add_department') }}">
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <label class="form-label" style="font-weight: 600; color: #475569;">Department Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g., School of Computer Science" required 
+                               style="padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 1rem;">
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <label class="form-label" style="font-weight: 600; color: #475569;">Head of Department (HOD)</label>
+                        <input type="text" class="form-control" name="head_of_department" placeholder="Full name of the department head"
+                               style="padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 1rem;">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label" style="font-weight: 600; color: #475569;">Contact Email</label>
+                        <input type="email" class="form-control" name="contact_email" placeholder="dept.head@university.edu"
+                               style="padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 1rem;">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label" style="font-weight: 600; color: #475569;">Contact Phone</label>
+                        <input type="text" class="form-control" name="contact_phone" placeholder="+91 XXXXX XXXXX"
+                               style="padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 1rem;">
+                    </div>
+
+                    <div class="col-md-12" style="margin-top: 2rem;">
+                        <button type="submit" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #3b82f6, #1e3a8a); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 20px rgba(30, 58, 138, 0.2); transition: all 0.3s;">
+                            <i class="fas fa-save" style="margin-right: 0.5rem;"></i> Save Department
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+</style>
+{% endblock %}

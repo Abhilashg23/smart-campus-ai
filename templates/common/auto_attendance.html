@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Auto Attendance - Smart Campus{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem; max-width: 900px;">
+    <h2 style="color: white; margin-bottom: 1rem; text-align: center;"> Automatic Attendance Detection</h2>
+
+    <div class="card">
+        <div class="card-body" style="text-align: center;">
+            <!-- Camera Container with Overlay -->
+            <div style="position: relative; display: inline-block; margin-bottom: 1rem;">
+                <video id="camera-feed" autoplay
+                    style="width: 100%; max-width: 640px; border-radius: var(--radius-md);"></video>
+                <canvas id="overlay-canvas"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+
+                <!-- Detection Status -->
+                <div id="detection-status"
+                    style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-weight: bold;">
+                    <span id="status-text"> Stopped</span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div style="margin-top: 1.5rem;">
+                <button class="btn btn-success" id="startBtn"
+                    style="margin: 0.5rem; font-size: 1.1rem; padding: 0.75rem 2rem;">
+                    Start Auto Detection
+                </button>
+                <button class="btn btn-danger" id="stopBtn"
+                    style="margin: 0.5rem; font-size: 1.1rem; padding: 0.75rem 2rem; display: none;">
+                    Stop Detection
+                </button>
+            </div>
+
+            <!-- Recent Detections -->
+            <div id="recent-detections" style="margin-top: 2rem; max-height: 300px; overflow-y: auto;">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;"> Recent Detections</h4>
+                <div id="detection-list" style="text-align: left;">
+                    <p style="color: var(--text-secondary); text-align: center;">No detections yet. Start detection to
+                        begin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Card -->
+    <div class="card"
+        style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));">
+        <div class="card-body">
+            <h4 style="color: var(--primary-color); margin-bottom: 1rem;"> How It Works</h4>
+            <ul style="color: var(--text-secondary); line-height: 1.8;">
+                <li>Click "Start Auto Detection" to begin monitoring</li>
+                <li>System continuously scans for faces every 3 seconds</li>
+                <li>Recognized students/faculty are automatically marked present</li>
+                <li>Each person can only be marked once per day</li>
+                <li>Green box appears around recognized faces</li>
+                <li>Recent detections are shown in real-time</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Audio for feedback -->
+<audio id="successSound" preload="auto">
+    <source
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGS57OihUBELTKXh8LJnHgU2jdXzzn0vBSh+zPDdkUELFGGy6OyrWBQLSKDf8sFuJAUuhM/y2Ik3CBhku+zooVARC0yl4fCyZx4FNo3V8859LwUofszw3ZFBChRhsujsq1gVC0ig3/LBbiQFL4TP8tmJNwgYZLvs6KFQEQtMpeHwsmceBTaN1fPOfS8FKH7M8N2RQQsUYbLo7KtYFQtIoN/ywW4kBS+Ez/LZiTcIGGS77OihUBELTKXh8LJnHgU2jdXzzn0vBSh+zPDdkUELFGGy6OyrWBULSKDf8sFuJAUvhM/y2Yk3CBhku+zooVARC0yl4fCyZx4FNo3V8859LwUofszw3ZFBCxRhsujsq1gVC0ig3/LBbiQFL4TP8tmJNwgYZLvs6KFQEQtMpeHwsmceBTaN1fPOfS8FKH7M8N2RQQsUYbLo7KtYFQtIoN/ywW4kBS+Ez/LZiTcIGGS77OihUBELTKXh8LJnHgU2jdXzzn0vBSh+zPDdkUELFGGy6OyrWBULSKDf8sFuJAUvhM/y2Yk3CBhku+zooVARC0yl4fCyZx4FNo3V8859LwUofszw3ZFBCxRhsujsq1gVC0ig3/LBbiQFL4TP8tmJNwgYZLvs6KFQEQtMpeHwsmceBTaN1fPOfS8FKH7M8N2RQQsUYbLo7KtYFQtIoN/ywW4kBS+Ez/LZiTcIGGS77OihUBELTKXh8LJnHgU2jdXzzn0vBSh+zPDdkUELFGGy6OyrWBULSKDf8sFuJAUvhM/y2Yk3CBhku+zooVARC0yl4fCyZx4FNo3V8859LwUofszw3ZFBCxRhsujsq1gVC0ig3/LBbiQFL4TP8tmJNwgYZLvs6KFQEQtMpeHwsmceBTaN1fPOfS8FKH7M8N2RQQsUYbLo7KtYFQtIoN/ywW4kBS+Ez/LZiTcIGGS77OihUBELTKXh8LJnHgU2jdXzzn0vBSh+zPDdkUELFGGy6OyrWBULSKDf8sFuJAUvhM/y"
+        type="audio/wav">
+</audio>
+
+<script>
+    const video = document.getElementById('camera-feed');
+    const canvas = document.getElementById('overlay-canvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusText = document.getElementById('status-text');
+    const detectionList = document.getElementById('detection-list');
+    const successSound = document.getElementById('successSound');
+
+    let detectionInterval = null;
+    let isDetecting = false;
+    let detectedToday = new Set();
+
+    // Start camera
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+        .then(stream => {
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+            };
+        })
+        .catch(err => {
+            alert('Error accessing camera: ' + err.message);
+        });
+
+    function captureImage() {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        tempCanvas.getContext('2d').drawImage(video, 0, 0);
+
+        return new Promise((resolve) => {
+            tempCanvas.toBlob(resolve, 'image/jpeg');
+        });
+    }
+
+    function playSuccess() {
+        successSound.currentTime = 0;
+        successSound.play().catch(e => console.log('Audio play failed:', e));
+    }
+
+    function addDetection(userName, regNum, confidence, alreadyMarked) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+
+        const detectionItem = document.createElement('div');
+        detectionItem.style.cssText = 'padding: 1rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border-radius: var(--radius-sm); border-left: 4px solid var(--success-color);';
+
+        const status = alreadyMarked ? '✓ Already marked today' : '✓ Attendance marked';
+        const statusColor = alreadyMarked ? 'var(--warning-color)' : 'var(--success-color)';
+        const regDisplay = regNum ? ` (${regNum})` : '';
+
+        detectionItem.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="color: var(--primary-color); font-size: 1.1rem;">${userName}${regDisplay}</strong>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+                        Confidence: ${confidence}% | ${timeStr}
+                    </div>
+                </div>
+                <div style="color: ${statusColor}; font-weight: bold; font-size: 0.95rem;">
+                    ${status}
+                </div>
+            </div>
+        `;
+
+        // Clear "no detections" message
+        if (detectionList.querySelector('p')) {
+            detectionList.innerHTML = '';
+        }
+
+        // Add to top of list
+        detectionList.insertBefore(detectionItem, detectionList.firstChild);
+
+        // Keep only last 10 detections
+        while (detectionList.children.length > 10) {
+            detectionList.removeChild(detectionList.lastChild);
+        }
+    }
+
+    async function detectFaces() {
+        if (!isDetecting) return;
+
+        try {
+            const imageBlob = await captureImage();
+            const formData = new FormData();
+            formData.append('image', imageBlob, 'detect.jpg');
+
+            const response = await fetch('/api/face/verify', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (data.success) {
+                // Draw green box around detected face
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(
+                    canvas.width * 0.25,
+                    canvas.height * 0.2,
+                    canvas.width * 0.5,
+                    canvas.height * 0.6
+                );
+
+                // Prepare display text
+                const userName = data.user.full_name || `${data.user.first_name} ${data.user.last_name}`;
+                const regNum = data.user.registration_id || '';
+
+                // Draw name and registration label (larger box for two lines)
+                ctx.fillStyle = 'rgba(0, 255, 0, 0.9)';
+                ctx.fillRect(canvas.width * 0.25, canvas.height * 0.2 - 60, canvas.width * 0.5, 55);
+
+                // Draw name
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 18px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(userName, canvas.width * 0.5, canvas.height * 0.2 - 35);
+
+                // Draw registration number if available
+                if (regNum) {
+                    ctx.font = 'bold 16px Inter';
+                    ctx.fillText(regNum, canvas.width * 0.5, canvas.height * 0.2 - 15);
+                }
+
+                // Check if already detected today
+                const userId = data.user.id;
+                const alreadyMarked = data.message.includes('already marked');
+
+                if (!detectedToday.has(userId)) {
+                    playSuccess();
+                    detectedToday.add(userId);
+                }
+
+                // Extract confidence from message
+                const confidenceMatch = data.message.match(/([\d.]+)%/);
+                const confidence = confidenceMatch ? confidenceMatch[1] : '100.0';
+
+                addDetection(userName, regNum, confidence, alreadyMarked);
+            }
+        } catch (error) {
+            console.log('Detection error:', error);
+        }
+    }
+
+    startBtn.addEventListener('click', () => {
+        isDetecting = true;
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        statusText.textContent = 'Detecting...';
+        statusText.parentElement.style.background = 'rgba(0, 200, 0, 0.7)';
+
+        // Detect every 3 seconds
+        detectionInterval = setInterval(detectFaces, 3000);
+        detectFaces(); // Run immediately
+    });
+
+    stopBtn.addEventListener('click', () => {
+        isDetecting = false;
+        stopBtn.style.display = 'none';
+        startBtn.style.display = 'inline-block';
+        statusText.textContent = 'Stopped';
+        statusText.parentElement.style.background = 'rgba(0, 0, 0, 0.7)';
+
+        if (detectionInterval) {
+            clearInterval(detectionInterval);
+            detectionInterval = null;
+        }
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+</script>
+{% endblock %}

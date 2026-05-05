@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Departments - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem; max-width: 1400px; min-height: 100vh;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(59, 130, 246, 0.9)); backdrop-filter: blur(10px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); color: white;">
+        <div>
+            <h1 style="margin: 0; font-size: 2.25rem; font-weight: 800;">Campus Departments</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.8; font-size: 1.1rem;">Manage and organize university schools and departments</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ url_for('admin.dashboard') }}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="{{ url_for('admin.add_department') }}" style="padding: 0.75rem 1.5rem; background: #ffffff; color: #1e3a8a; border-radius: 12px; text-decoration: none; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3); transition: all 0.3s;">
+                <i class="fas fa-plus"></i> Add Department
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius: 12px; margin-bottom: 2rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Departments Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">
+        {% for dept in departments %}
+        <div class="dept-card" style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: all 0.3s;">
+            <div style="background: linear-gradient(135deg, #3b82f6, #1e3a8a); padding: 1.5rem; color: white;">
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{{ dept.name }}</h3>
+                <span style="font-size: 0.85rem; opacity: 0.8;">Department ID: #{{ dept.id }}</span>
+            </div>
+            <div style="padding: 1.5rem;">
+                <div style="margin-bottom: 1.25rem;">
+                    <span style="display: block; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Head of Department</span>
+                    <span style="display: block; color: #1e293b; font-weight: 600; font-size: 1.05rem;">{{ dept.head_of_department or 'Not assigned' }}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: #475569; font-size: 0.95rem;">
+                        <i class="fas fa-envelope" style="color: #3b82f6; width: 16px;"></i>
+                        <span>{{ dept.contact_email or 'No email set' }}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: #475569; font-size: 0.95rem;">
+                        <i class="fas fa-phone" style="color: #10b981; width: 16px;"></i>
+                        <span>{{ dept.contact_phone or 'No phone set' }}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: #475569; font-size: 0.95rem;">
+                        <i class="fas fa-users" style="color: #8b5cf6; width: 16px;"></i>
+                        <span>{{ dept.users|length }} Members</span>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                <button class="btn-icon" title="Edit Department"><i class="fas fa-edit"></i></button>
+                <button class="btn-icon" style="color: #ef4444;" title="Delete Department"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not departments %}
+        <div style="grid-column: 1 / -1; padding: 5rem; text-align: center; background: #f8fafc; border-radius: 20px; border: 2px dashed #e2e8f0;">
+            <div style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"><i class="fas fa-building"></i></div>
+            <h2 style="color: #64748b; font-weight: 600;">No departments found</h2>
+            <p style="color: #94a3b8;">Start by adding a new department to the university.</p>
+            <a href="{{ url_for('admin.add_department') }}" class="btn btn-primary mt-3">Add First Department</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .dept-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    }
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        background: white;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .btn-icon:hover {
+        background: #f1f5f9;
+        color: #3b82f6;
+    }
+</style>
+{% endblock %}
